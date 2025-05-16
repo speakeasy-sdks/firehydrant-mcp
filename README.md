@@ -100,7 +100,14 @@ realpath mcpServer.js
 3. Open Claude Desktop → **Settings** → **Developers** → **Edit Config** and add your server:
 
 ```json
-fi
+{
+  "mcpServers": {
+    "<server_name>": {
+      "command": "<absolute_path_to_node>",
+      "args": ["<absolute_path_to_mcpServer.js>"]
+    }
+  }
+}
 ```
 
 Restart Claude Desktop to activate this change.
