@@ -32,4 +32,4 @@ mcp-typescript:
   defaultErrorName: FireHydrantDefaultError
   inputModelSuffix: input
   outputModelSuffix: output
-  packageName: firehydrant-mcp-server
+  packageName: firehydrant-mcp

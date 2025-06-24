@@ -6,7 +6,7 @@ management:
   speakeasyVersion: 1.568.2
   generationVersion: 2.634.2
   releaseVersion: 0.0.1-beta.1
-  configChecksum: 0c30c30124adca05d6549d35658b94bf
+  configChecksum: 0e337d77c5f457285ed20387ef84dd0b
 features:
   mcp-typescript:
     additionalDependencies: 0.1.0

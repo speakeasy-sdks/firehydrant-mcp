@@ -147,7 +147,7 @@ Add the following server definition to your `claude_desktop_config.json` file:
     "FireHydrant": {
       "command": "npx",
       "args": [
-        "-y", "--package", "firehydrant-mcp-server",
+        "-y", "--package", "firehydrant-mcp",
         "--",
         "mcp", "start",
         "--api-key", "..."
@@ -167,7 +167,7 @@ Create a `.cursor/mcp.json` file in your project root with the following content
     "FireHydrant": {
       "command": "npx",
       "args": [
-        "-y", "--package", "firehydrant-mcp-server",
+        "-y", "--package", "firehydrant-mcp",
         "--",
         "mcp", "start",
         "--api-key", "..."
@@ -205,7 +205,7 @@ If the repo is a private repo you must add your Github PAT to download a release
 For a full list of server arguments, run:
 
 ```bash
-npx -y --package firehydrant-mcp-server -- mcp start --help
+npx -y --package firehydrant-mcp -- mcp start --help
 ```
 
 ### Package Managers
