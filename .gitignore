@@ -1,3 +1,9 @@
-.env
-node_modules
+**/.speakeasy/logs/
+**/.speakeasy/reports/
+**/.speakeasy/temp/
+/.eslintcache
+/.tsbuildinfo
+/bin
+/esm
+/node_modules
 .DS_Store

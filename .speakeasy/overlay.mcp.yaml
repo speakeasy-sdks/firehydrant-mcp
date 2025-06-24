@@ -1,0 +1,77 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: example overlay
+  version: 0.0.0
+actions:
+  - target: $.paths..[?@.operationId == "list_incident_retrospectives"]
+    update:
+      x-speakeasy-mcp:
+        disabled: false
+        description: >
+          Lists all retrospectives (RCAs) for an incident. Among other things, this is
+          useful for:
+
+            - Getting a list of retrospectives for an incident,
+            - Getting basic data about a retrospective.
+            - Getting the fields of a retrospective.
+
+  - target: $.paths..[?@.operationId == "list_incidents"]
+    update:
+      x-speakeasy-mcp:
+        disabled: false
+
+  - target: $.paths..[?@.operationId == "create_incident"]
+    update:
+      x-speakeasy-mcp:
+        disabled: false
+
+  - target: $.paths..[?@.operationId == "update_incident_retrospective_field"]
+    update:
+      x-speakeasy-mcp:
+        disabled: false
+        description: >
+          Updates a field in a retrospective (RCA) for an incident. Among other things,
+          this is useful for:
+
+            - Updating a field in a retrospective,
+            - Updating the value of a field in a retrospective.
+
+          Values should be compatible with the tiptap editor (array structure).
+  - target: $["components"]["schemas"]["Incidents_RetrospectiveFieldEntity"]["properties"]["value"]["type"]
+    remove: true
+  - target: $.components.schemas
+    update:
+      update_incident_retrospective_field:
+        properties:
+          value:
+            oneOf:
+              - type: integer
+              - type: string
+              - type: array
+                items: string
+              - type: array
+                items:
+                  type: object
+                  additionalProperties: true
+            format: ~
+      Incidents_RetrospectiveFieldEntity:
+        properties:
+          value:
+            oneOf:
+              - type: integer
+              - type: string
+              - type: array
+                items: string
+              - type: array
+                items:
+                  type: object
+                  additionalProperties: true
+
+  - target: $.paths..[?@.operationId == "list_alerts"]
+    update:
+      x-speakeasy-mcp:
+        disabled: false
+
+  - target: $.paths.*[?@["x-speakeasy-mcp"].disabled != false]
+    remove: true

@@ -1,0 +1,31 @@
+speakeasyVersion: 1.568.2
+sources:
+    FireHydrant-OAS:
+        sourceNamespace: fire-hydrant-mcp-oas
+        sourceRevisionDigest: sha256:ceef7be818a0cacdf0885881907776c99fcd49772e68e1c819f63b6bca128990
+        sourceBlobDigest: sha256:9f00b4f476b300749f5ff53a0ed931764b8924ca3c71e3e00095fa3b133f4d8a
+        tags:
+            - latest
+            - 0.0.1
+targets:
+    fire-hydrant:
+        source: FireHydrant-OAS
+        sourceNamespace: fire-hydrant-mcp-oas
+        sourceRevisionDigest: sha256:ceef7be818a0cacdf0885881907776c99fcd49772e68e1c819f63b6bca128990
+        sourceBlobDigest: sha256:9f00b4f476b300749f5ff53a0ed931764b8924ca3c71e3e00095fa3b133f4d8a
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        FireHydrant-OAS:
+            inputs:
+                - location: registry.speakeasyapi.dev/firehydrant/firehydrant/firehydrant-oas:main
+            overlays:
+                - location: .speakeasy/overlay.mcp.yaml
+            output: .speakeasy/openapi.output.yaml
+            registry:
+                location: registry.speakeasyapi.dev/firehydrant/firehydrant/fire-hydrant-mcp-oas
+    targets:
+        fire-hydrant:
+            target: mcp-typescript
+            source: FireHydrant-OAS

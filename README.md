@@ -1,181 +1,249 @@
-# Postman Agent Generator
+# FireHydrant MCP Server
 
-Welcome to your generated agent! 🚀
+Model Context Protocol (MCP) Server for the *FireHydrant* API.
 
-This project was created with the [Postman Agent Generator](https://postman.com/explore/agent-generator), configured to [Model Context Provider (MCP)](https://modelcontextprotocol.io/introduction) Server output mode. It provides you with:
+<div align="left">
+    <a href="https://www.speakeasy.com/?utm_source=mcp-server&utm_campaign=mcp-typescript"><img src="https://custom-icon-badges.demolab.com/badge/-Built%20By%20Speakeasy-212015?style=for-the-badge&logoColor=FBE331&logo=speakeasy&labelColor=545454" /></a>
+    <a href="https://opensource.org/licenses/MIT">
+        <img src="https://img.shields.io/badge/License-MIT-blue.svg" style="width: 100px; height: 28px;" />
+    </a>
+</div>
 
-- ✅ An MCP-compatible server (`mcpServer.js`)
-- ✅ Automatically generated JavaScript tools for each selected Postman API request
 
-Let's set things up!
+<br /><br />
+> [!IMPORTANT]
+> This MCP Server is not yet ready for production use. To complete setup please follow the steps outlined in your [workspace](https://app.speakeasy.com/org/firehydrant/firehydrant). Delete this notice before publishing to a package manager.
 
-## 🚦 Getting Started
+<!-- Start Summary [summary] -->
+## Summary
 
-### ⚙️ Prerequisites
+FireHydrant API: The FireHydrant API is based around REST. It uses Bearer token authentication and returns JSON responses. You can use the FireHydrant API to configure integrations, define incidents, and set up webhooks--anything you can do on the FireHydrant UI.
 
-Before starting, please ensure you have:
+* [Dig into our API endpoints](https://developers.firehydrant.io/docs/api)
+* [View your bot users](https://app.firehydrant.io/organizations/bots)
 
-- [Node.js (v16+ required, v20+ recommended)](https://nodejs.org/)
-- [npm](https://www.npmjs.com/) (included with Node)
+## Base API endpoint
 
-### 📥 Installation & Setup
+[https://api.firehydrant.io/v1](https://api.firehydrant.io/v1)
 
-**1. Install dependencies**
+## Current version
 
-Run from your project's root directory:
+v1
 
-```sh
-npm install
-```
+## Authentication
 
-### 🔐 Set tool environment variables
+All requests to the FireHydrant API require an `Authorization` header with the value set to `Bearer {token}`. FireHydrant supports bot tokens to act on behalf of a computer instead of a user's account. This prevents integrations from breaking when people leave your organization or their token is revoked. See the Bot tokens section (below) for more information on this.
 
-In the `.env` file, you'll see environment variable placeholders, one for each workspace that the selected tools are from. For example, if you selected requests from 2 workspaces, e.g. Acme and Widgets, you'll see two placeholders:
-
-```
-ACME_API_KEY=
-WIDGETS_API_KEY=
-```
-
-Update the values with actual API keys for each API. These environment variables are used inside of the generated tools to set the API key for each request. You can inspect a file in the `tools` directory to see how it works.
-
-```javascript
-// environment variables are used inside of each tool file
-const apiKey = process.env.ACME_API_KEY;
-```
-
-**Caveat:** This may not be correct for every API. The generation logic is relatively simple - for each workspace, we create an environment variable with the same name as the workspace slug, and then use that environment variable in each tool file that belongs to that workspace. If this isn't the right behavior for your chosen API, no problem! You can manually update anything in the `.env` file or tool files to accurately reflect the API's method of authentication.
-
-### 🛠️ List Available Tools
-
-List descriptions and parameters from all generated tools with:
-
-```sh
-node index.js tools
-```
-
-Example:
+An example of a header to authenticate against FireHydrant would look like:
 
 ```
-Available Tools:
-
-Workspace: acme-workspace
-  Collection: useful-api
-    list_all_customers
-      Description: Retrieve a list of useful things.
-      Parameters:
-        - magic: The required magic power
-        - limit: Number of results returned
-        [...additional parameters...]
+Authorization: Bearer fhb-thisismytoken
 ```
 
-## 🌐 Running the MCP Server
+## Bot tokens
 
-The MCP Server (`mcpServer.js`) exposes your automated API tools to MCP-compatible clients, such as Claude Desktop or the Postman Desktop Application.
+To access the FireHydrant API, you must authenticate with a bot token. (You must have owner permissions on your organization to see bot tokens.) Bot users allow you to interact with the FireHydrant API by using token-based authentication. To create bot tokens, log in to your organization and refer to the **Bot users** [page](https://app.firehydrant.io/organizations/bots).
 
-### A) 🖥️ Run with Postman
+Bot tokens enable you to create a bot that has no ties to any user. Normally, all actions associated with an API token are associated with the user who created it. Bot tokens attribute all actions to the bot user itself. This way, all data associated with the token actions can be performed against the FireHydrant API without a user.
 
-The Postman Desktop Application is the easiest way to run and test MCP servers.
+Every request to the API is authenticated unless specified otherwise.
 
-Step 1: Download the latest Postman Desktop Application from [https://www.postman.com/downloads/](https://www.postman.com/downloads/).
+### Rate Limiting
 
-Step 2: Read out the documentation article [here](https://learning.postman.com/docs/postman-ai-agent-builder/mcp-requests/overview/) for the next steps.
+Currently, requests made with bot tokens are rate limited on a per-account level. If your account has multiple bot token then the rate limit is shared across all of them. As of February 7th, 2023, the rate limit is at least 50 requests per account every 10 seconds, or 300 requests per minute.
 
-### B) 👩‍💻 Run with Claude Desktop
+Rate limited responses will be served with a `429` status code and a JSON body of:
 
-To integrate with Claude Desktop:
-
-1. Find node path:
-
-```sh
-which node
+```json
+{"error": "rate limit exceeded"}
+```
+and headers of:
+```
+"RateLimit-Limit" -> the maximum number of requests in the rate limit pool
+"Retry-After" -> the number of seconds to wait before trying again
 ```
 
-2. Find `mcpServer.js` path:
+## How lists are returned
 
-```sh
-realpath mcpServer.js
+API lists are returned as arrays. A paginated entity in FireHydrant will return two top-level keys in the response object: a data key and a pagination key.
+
+### Paginated requests
+
+The `data` key is returned as an array. Each item in the array includes all of the entity data specified in the API endpoint. (The per-page default for the array is 20 items.)
+
+Pagination is the second key (`pagination`) returned in the overall response body. It includes medtadata around the current page, total count of items, and options to go to the next and previous page. All of the specifications returned in the pagination object are available as URL parameters. So if you want to specify, for example, going to the second page of a response, you can send a request to the same endpoint but pass the URL parameter **page=2**.
+
+For example, you might request **https://api.firehydrant.io/v1/environments/** to retrieve environments data. The JSON returned contains the above-mentioned data section and pagination section. The data section includes various details about an incident, such as the environment name, description, and when it was created.
+
+```
+{
+  "data": [
+    {
+      "id": "f8125cf4-b3a7-4f88-b5ab-57a60b9ed89b",
+      "name": "Production - GCP",
+      "description": "",
+      "created_at": "2021-02-17T20:02:10.679Z"
+    },
+    {
+      "id": "a69f1f58-af77-4708-802d-7e73c0bf261c",
+      "name": "Staging",
+      "description": "",
+      "created_at": "2021-04-16T13:41:59.418Z"
+    }
+  ],
+  "pagination": {
+    "count": 2,
+    "page": 1,
+    "items": 2,
+    "pages": 1,
+    "last": 1,
+    "prev": null,
+    "next": null
+  }
+}
 ```
 
-3. Open Claude Desktop → **Settings** → **Developers** → **Edit Config** and add your server:
+To request the second page, you'd request the same endpoint with the additional query parameter of `page` in the URL:
+
+```
+GET https://api.firehydrant.io/v1/environments?page=2
+```
+
+If you need to modify the number of records coming back from FireHydrant, you can use the `per_page` parameter (max is 200):
+
+```
+GET https://api.firehydrant.io/v1/environments?per_page=50
+```
+<!-- End Summary [summary] -->
+
+<!-- Start Table of Contents [toc] -->
+## Table of Contents
+<!-- $toc-max-depth=2 -->
+* [FireHydrant MCP Server](#firehydrant-mcp-server)
+  * [Base API endpoint](#base-api-endpoint)
+  * [Current version](#current-version)
+  * [Authentication](#authentication)
+  * [Bot tokens](#bot-tokens)
+  * [How lists are returned](#how-lists-are-returned)
+  * [Installation](#installation)
+* [Development](#development)
+  * [Contributions](#contributions)
+
+<!-- End Table of Contents [toc] -->
+
+<!-- Start Installation [installation] -->
+## Installation
+
+> [!TIP]
+> To finish publishing your MCP Server to npm and others you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide).
+
+### Claude
+
+Add the following server definition to your `claude_desktop_config.json` file:
 
 ```json
 {
   "mcpServers": {
-    "<server_name>": {
-      "command": "<absolute_path_to_node>",
-      "args": ["<absolute_path_to_mcpServer.js>"]
+    "FireHydrant": {
+      "command": "npx",
+      "args": [
+        "-y", "--package", "firehydrant-mcp-server",
+        "--",
+        "mcp", "start",
+        "--api-key", "..."
+      ]
     }
   }
 }
 ```
 
-Restart Claude Desktop to activate this change.
+### Cursor
 
-### Additional Options
-
-#### 🐳 Docker Deployment (Production)
-
-For production deployments, you can use Docker:
-
-**1. Build Docker image**
-
-```sh
-docker build -t <your_server_name> .
-```
-
-**2. Claude Desktop Integration**
-
-Add Docker server configuration to Claude Desktop (Settings → Developers → Edit Config):
+Create a `.cursor/mcp.json` file in your project root with the following content:
 
 ```json
 {
   "mcpServers": {
-    "<your_server_name>": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "--env-file=.env", "<your_server_name>"]
+    "FireHydrant": {
+      "command": "npx",
+      "args": [
+        "-y", "--package", "firehydrant-mcp-server",
+        "--",
+        "mcp", "start",
+        "--api-key", "..."
+      ]
     }
   }
 }
 ```
 
-> Add your environment variables (API keys, etc.) inside the `.env` file.
+### Standalone Binary
 
-#### 🌐 Server-Sent Events (SSE)
+Run the MCP server as a standalone binary with no additional dependencies. Pull these binaries from available Github releases:
 
-To run the server with Server-Sent Events (SSE) support, use the `--sse` flag:
-
-```sh
-node mcpServer.js --sse
+```bash
+curl -L -o mcp-server \
+    https://github.com/{org}/{repo}/releases/download/{tag}/mcp-server-bun-darwin-arm64 && \
+chmod +x mcp-server
 ```
 
-## 🐳 Dockerfile (Included)
+If the repo is a private repo you must add your Github PAT to download a release `-H "Authorization: Bearer {GITHUB_PAT}"`.
 
-The project comes bundled with the following minimal Docker setup:
-
-```dockerfile
-FROM node:22.12-alpine AS builder
-
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
-
-COPY . .
-
-ENTRYPOINT ["node", "mcpServer.js"]
+```json
+{
+  "mcpServers": {
+    "Todos": {
+      "command": "./DOWNLOAD/PATH/mcp-server",
+      "args": [
+        "start"
+      ]
+    }
+  }
+}
 ```
 
-## ➕ Adding New Tools
+For a full list of server arguments, run:
 
-Extend your agent with more tools easily:
+```bash
+npx -y --package firehydrant-mcp-server -- mcp start --help
+```
 
-1. Visit [Postman Agent Generator](https://postman.com/explore/agent-generator).
-2. Pick new API request(s), generate a new agent, and download it.
-3. Copy new generated tool(s) into your existing project's `tools/` folder.
-4. Update your `tools/paths.js` file to include new tool references.
+### Package Managers
 
-## 💬 Questions & Support
+The MCP Server can be installed with either [npm](https://www.npmjs.com/), [pnpm](https://pnpm.io/), [bun](https://bun.sh/) or [yarn](https://classic.yarnpkg.com/en/) package managers.
 
-Visit the [Postman Agent Generator](https://postman.com/explore/agent-generator) page for updates and new capabilities.
+#### NPM
 
-Visit the [Postman Community](https://community.postman.com/) to share what you've built, ask questions and get help.
+```bash
+npm add <UNSET>
+```
+
+#### PNPM
+
+```bash
+pnpm add <UNSET>
+```
+
+#### Bun
+
+```bash
+bun add <UNSET>
+```
+
+#### Yarn
+
+```bash
+yarn add <UNSET>
+```
+<!-- End Installation [installation] -->
+
+<!-- Placeholder for Future Speakeasy SDK Sections -->
+
+# Development
+
+## Contributions
+
+While we value contributions to this MCP Server, the code is generated programmatically. Any manual changes added to internal files will be overwritten on the next generation. 
+We look forward to hearing your feedback. Feel free to open a PR or an issue with a proof of concept and we'll do our best to include it in a future release. 
+
+### MCP Server Created by [Speakeasy](https://www.speakeasy.com/?utm_source=mcp-server&utm_campaign=mcp-typescript)
