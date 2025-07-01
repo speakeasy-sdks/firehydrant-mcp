@@ -1,0 +1,15 @@
+workflowVersion: 1.0.0
+speakeasyVersion: latest
+sources:
+    FireHydrant-OAS:
+        inputs:
+            - location: registry.speakeasyapi.dev/firehydrant/firehydrant/firehydrant-oas:main
+        overlays:
+            - location: .speakeasy/overlay.mcp.yaml
+        output: .speakeasy/openapi.output.yaml
+        registry:
+            location: registry.speakeasyapi.dev/firehydrant/firehydrant/fire-hydrant-mcp-oas
+targets:
+    fire-hydrant:
+        target: mcp-typescript
+        source: FireHydrant-OAS
