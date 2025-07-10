@@ -693,20 +693,25 @@ paths:
   "/v1/conversations/{conversation_id}/comments/{comment_id}/reactions": {}
   "/v1/conversations/{conversation_id}/comments/{comment_id}": {}
   "/v1/conversations/{conversation_id}/comments": {}
+  "/v1/signals/alerts/{id}": {}
   "/v1/signals/analytics/timeseries": {}
   "/v1/signals/analytics/grouped_metrics": {}
   "/v1/signals/analytics/mttx": {}
+  "/v1/signals/analytics/noise/metrics": {}
   "/v1/signals/analytics/shifts/export": {}
   "/v1/signals/call_routes": {}
   "/v1/signals/call_routes/{id}": {}
   "/v1/signals/event_sources": {}
   "/v1/signals/event_sources/{transposer_slug}": {}
+  "/v1/signals/hacker_mode": {}
   "/v1/signals/grouping": {}
   "/v1/signals/grouping/{id}": {}
   "/v1/signals/email_targets": {}
   "/v1/signals/email_targets/{id}": {}
   "/v1/signals/webhook_targets": {}
   "/v1/signals/webhook_targets/{id}": {}
+  "/v1/signals/notification_policy_items": {}
+  "/v1/signals/notification_policy_items/{id}": {}
   "/v1/signals/transposers": {}
   "/v1/signals/ingest_url": {}
   "/v1/signals/debugger": {}
@@ -2595,7 +2600,20 @@ components:
           nullable: true
           items:
             type: "string"
+        "signals_notification_policy_compliance":
+          type: "array"
+          nullable: true
+          items: {"$ref": "#/components/schemas/Signals_API_NotificationPolicyItemComplianceEntity"}
       description: "UserEntity model"
+    "Signals_API_NotificationPolicyItemComplianceEntity":
+      type: "object"
+      properties:
+        "notification_policy_item_id":
+          type: "string"
+          nullable: true
+        "is_compliant":
+          type: "boolean"
+          nullable: true
     "Incidents_StatusPageEntity":
       type: "object"
       properties:
@@ -2854,6 +2872,9 @@ components:
           type: "string"
           nullable: true
         "transcription_sub_code":
+          type: "string"
+          nullable: true
+        "previous_host_assignment":
           type: "string"
           nullable: true
       description: "Incidents_ConferenceBridgeEntity model"
@@ -3200,6 +3221,10 @@ components:
               "timeout":
                 type: "string"
                 description: "Timeout in seconds for the step"
+              "on_call_rotation_id":
+                type: "string"
+                description: "The ID of a specific on-call rotation that should be routed to if the `target_type` is `OnCallSchedule`. If not provided, the schedule's first rotation will be used."
+                nullable: true
         "target":
           required:
             - "id"
@@ -3269,6 +3294,9 @@ components:
           type: "string"
           nullable: true
         "type":
+          type: "string"
+          nullable: true
+        "team_id":
           type: "string"
           nullable: true
         "is_pageable":
@@ -5097,6 +5125,9 @@ components:
         "is_expired":
           type: "boolean"
           nullable: true
+        "is_noise":
+          type: "boolean"
+          nullable: true
         "parent_alerts":
           type: "array"
           nullable: true
@@ -6143,6 +6174,10 @@ components:
       properties:
         "name":
           type: "string"
+        "description":
+          type: "string"
+          description: "A description of the incident type"
+          nullable: true
         "template":
           type: "object"
           properties:
@@ -6209,6 +6244,9 @@ components:
           type: "string"
           nullable: true
         "name":
+          type: "string"
+          nullable: true
+        "description":
           type: "string"
           nullable: true
         "template": {"$ref": "#/components/schemas/NullableIncidentTypeEntity_TemplateEntity"}
@@ -6335,6 +6373,10 @@ components:
       properties:
         "name":
           type: "string"
+        "description":
+          type: "string"
+          description: "A description of the incident type"
+          nullable: true
         "template":
           type: "object"
           properties:
@@ -6425,7 +6467,10 @@ components:
           type: "string"
           format: "date-time"
           nullable: true
-        "connections": {"$ref": "#/components/schemas/NullableIntegrations_ConnectionEntity"}
+        "connections":
+          type: "array"
+          nullable: true
+          items: {"$ref": "#/components/schemas/Integrations_ConnectionEntity"}
         "enabled":
           type: "boolean"
           nullable: true
@@ -7480,8 +7525,10 @@ components:
           type: "string"
           nullable: true
         "prerequisites":
-          type: "object"
+          type: "array"
           nullable: true
+          items:
+            type: "object"
         "integration": {"$ref": "#/components/schemas/NullableIntegrations_IntegrationEntity"}
         "supported_runbook_types":
           type: "array"
@@ -7514,7 +7561,11 @@ components:
     "Runbooks_ActionConfigEntity":
       type: "object"
       properties:
-        "elements": {"$ref": "#/components/schemas/NullableRunbooks_ElementEntity"}
+        "elements":
+          type: "array"
+          description: "A list of elements that can be used in this action configuration"
+          nullable: true
+          items: {"$ref": "#/components/schemas/Runbooks_ElementEntity"}
         "documentation_url":
           type: "string"
           description: "Location of documentation for this action"
@@ -7900,7 +7951,10 @@ components:
           nullable: true
         "created_by": {"$ref": "#/components/schemas/NullableAuthorEntity"}
         "updated_by": {"$ref": "#/components/schemas/NullableAuthorEntity"}
-        "steps": {"$ref": "#/components/schemas/NullableRunbookStepEntity"}
+        "steps":
+          type: "array"
+          nullable: true
+          items: {"$ref": "#/components/schemas/RunbookStepEntity"}
         "attachment_rule": {"$ref": "#/components/schemas/NullableRules_RuleEntity"}
         "votes": {"$ref": "#/components/schemas/NullableVotesEntity"}
         "is_editable":
@@ -9756,7 +9810,10 @@ components:
           format: "date-time"
           nullable: true
         "created_by": {"$ref": "#/components/schemas/NullableAuthorEntity"}
-        "task_list_items": {"$ref": "#/components/schemas/NullableTaskListItemEntity"}
+        "task_list_items":
+          type: "array"
+          nullable: true
+          items: {"$ref": "#/components/schemas/TaskListItemEntity"}
       description: "TaskListEntity model"
     "TaskListItemEntity":
       type: "object"
@@ -10139,6 +10196,28 @@ components:
           type: "string"
           description: "Text body of comment"
       description: "Creates a comment for a project"
+    "update_signals_alert":
+      required:
+        - "noise"
+      type: "object"
+      properties:
+        "noise":
+          type: "boolean"
+          description: "Whether the alert is noisy"
+      description: "Update a Signal alert"
+    "Alerts_SignalAlertEntity":
+      type: "object"
+      properties:
+        "id":
+          type: "string"
+          nullable: true
+        "summary":
+          type: "string"
+          nullable: true
+        "is_noise":
+          type: "boolean"
+          nullable: true
+      description: "Alerts_SignalAlertEntity model"
     "Signals_API_Analytics_TimeseriesPointEntity":
       type: "object"
       properties:
@@ -10226,6 +10305,33 @@ components:
           description: "The mean time to resolve (MTTR) alerts in seconds"
           format: "float"
           nullable: true
+    "Signals_API_Analytics_NoiseMetricsEntity":
+      type: "object"
+      properties:
+        "data": {"$ref": "#/components/schemas/NullableSignals_API_Analytics_NoiseMetricsEntity_MetricEntity"}
+      description: "Signals_API_Analytics_NoiseMetricsEntity model"
+    "Signals_API_Analytics_NoiseMetricsEntity_MetricEntity":
+      type: "object"
+      properties:
+        "bucket":
+          type: "string"
+          description: "The time bucket"
+          nullable: true
+        "total_alerts":
+          type: "integer"
+          description: "The total number of alerts"
+          format: "int32"
+          nullable: true
+        "noisy_alerts":
+          type: "integer"
+          description: "The number of alerts marked as noise"
+          format: "int32"
+          nullable: true
+        "percentage":
+          type: "number"
+          description: "The percentage of alerts that are noise"
+          format: "float"
+          nullable: true
     "update_call_route":
       type: "object"
       properties:
@@ -10278,6 +10384,10 @@ components:
               "timeout":
                 type: "string"
                 description: "Timeout in seconds for the step"
+              "on_call_rotation_id":
+                type: "string"
+                description: "The ID of a specific on-call rotation that should be routed to if the `target_type` is `OnCallSchedule`. If not provided, the schedule's first rotation will be used."
+                nullable: true
         "target":
           required:
             - "id"
@@ -10377,6 +10487,19 @@ components:
       properties:
         "data": {"$ref": "#/components/schemas/NullableSignals_API_TransposerEntity"}
       description: "Signals_API_TransposerListEntity model"
+    "Signals_API_HackerModeEntity":
+      type: "object"
+      properties:
+        "enabled":
+          type: "boolean"
+          nullable: true
+        "url_key":
+          type: "string"
+          nullable: true
+        "url":
+          type: "string"
+          nullable: true
+      description: "Signals_API_HackerModeEntity model"
     "create_signals_alert_grouping_configuration":
       required:
         - "reference_alert_time_period"
@@ -10799,6 +10922,51 @@ components:
           description: "An optional secret we will provide in the `FH-Signature` header\nwhen sending a payload to the webhook target. This key will not be\nshown in any response once configured.\n"
           nullable: true
       description: "Update a Signals webhook target by ID"
+    "Signals_API_NotificationPolicyItemEntity":
+      type: "object"
+      properties:
+        "id":
+          type: "string"
+          nullable: true
+        "notification_group_method":
+          type: "string"
+          nullable: true
+          enum:
+            - "any"
+            - "push"
+            - "email"
+            - "voice"
+            - "mobile_text"
+            - "chat"
+        "max_delay":
+          type: "string"
+          description: "The maximum delay for notifications"
+          nullable: true
+        "priority":
+          type: "string"
+          nullable: true
+          enum:
+            - "HIGH"
+            - "MEDIUM"
+            - "LOW"
+        "created_at":
+          type: "string"
+          format: "date-time"
+          nullable: true
+        "updated_at":
+          type: "string"
+          format: "date-time"
+          nullable: true
+      description: "Signals_API_NotificationPolicyItemEntity model"
+    "Signals_API_NotificationPolicyItemEntityPaginated":
+      type: "object"
+      properties:
+        "data":
+          type: "array"
+          nullable: true
+          items: {"$ref": "#/components/schemas/Signals_API_NotificationPolicyItemEntity"}
+        "pagination": {"$ref": "#/components/schemas/NullablePaginationEntity"}
+      description: "Signals_API_NotificationPolicyItemEntityPaginated model"
     "Signals_API_IngestKeyEntity":
       type: "object"
       properties:
@@ -11323,6 +11491,10 @@ components:
       nullable: true
       allOf:
         - {"$ref": "#/components/schemas/UserEntity"}
+    "NullableSignals_API_NotificationPolicyItemComplianceEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_NotificationPolicyItemComplianceEntity"}
     "NullableIncidents_StatusPageEntity":
       nullable: true
       allOf:
@@ -12579,6 +12751,14 @@ components:
       nullable: true
       allOf:
         - {"$ref": "#/components/schemas/create_comment"}
+    "Nullableupdate_signals_alert":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/update_signals_alert"}
+    "NullableAlerts_SignalAlertEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Alerts_SignalAlertEntity"}
     "NullableSignals_API_Analytics_TimeseriesPointEntity":
       nullable: true
       allOf:
@@ -12603,6 +12783,14 @@ components:
       nullable: true
       allOf:
         - {"$ref": "#/components/schemas/Signals_API_Analytics_MttxMetricsEntity_MetricEntity"}
+    "NullableSignals_API_Analytics_NoiseMetricsEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_Analytics_NoiseMetricsEntity"}
+    "NullableSignals_API_Analytics_NoiseMetricsEntity_MetricEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_Analytics_NoiseMetricsEntity_MetricEntity"}
     "Nullableupdate_call_route":
       nullable: true
       allOf:
@@ -12619,6 +12807,10 @@ components:
       nullable: true
       allOf:
         - {"$ref": "#/components/schemas/Signals_API_TransposerListEntity"}
+    "NullableSignals_API_HackerModeEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_HackerModeEntity"}
     "Nullablecreate_signals_alert_grouping_configuration":
       nullable: true
       allOf:
@@ -12683,6 +12875,14 @@ components:
       nullable: true
       allOf:
         - {"$ref": "#/components/schemas/update_signals_webhook_target"}
+    "NullableSignals_API_NotificationPolicyItemEntity":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_NotificationPolicyItemEntity"}
+    "NullableSignals_API_NotificationPolicyItemEntityPaginated":
+      nullable: true
+      allOf:
+        - {"$ref": "#/components/schemas/Signals_API_NotificationPolicyItemEntityPaginated"}
     "NullableSignals_API_IngestKeyEntity":
       nullable: true
       allOf:

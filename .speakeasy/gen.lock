@@ -1,17 +1,17 @@
 lockVersion: 2.0.0
 id: 0dd544ca-3933-4c41-a5b5-b9a57ec94099
 management:
-  docChecksum: 0705bb8d3c7be892a2ae0c172da62bcd
+  docChecksum: 45bf20c20c51a13baf0693dd7342eb87
   docVersion: 0.0.1
-  speakeasyVersion: 1.568.2
-  generationVersion: 2.634.2
+  speakeasyVersion: 1.580.1
+  generationVersion: 2.656.3
   releaseVersion: 0.0.1-beta.1
-  configChecksum: 0e337d77c5f457285ed20387ef84dd0b
+  configChecksum: 2a7dd7aff2c21dc93d7ea9b5c4d83bd5
 features:
   mcp-typescript:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.0
-    core: 0.1.2
+    core: 0.1.3
     defaultEnabledRetries: 0.1.0
     enumUnions: 0.1.0
     globalSecurity: 0.1.0
@@ -28,11 +28,11 @@ generatedFiles:
   - eslint.config.mjs
   - package.json
   - src/core.ts
-  - src/funcs/Alerts_list_alerts.ts
-  - src/funcs/Incidents_create_incident.ts
-  - src/funcs/Incidents_list_incidents.ts
-  - src/funcs/Retrospectives_list_incident_retrospectives.ts
-  - src/funcs/Retrospectives_update_incident_retrospective_field.ts
+  - src/funcs/alertsListAlerts.ts
+  - src/funcs/incidentsCreateIncident.ts
+  - src/funcs/incidentsListIncidents.ts
+  - src/funcs/retrospectivesListIncidentRetrospectives.ts
+  - src/funcs/retrospectivesUpdateIncidentRetrospectiveField.ts
   - src/hooks/hooks.ts
   - src/hooks/types.ts
   - src/lib/base64.ts
@@ -64,11 +64,11 @@ generatedFiles:
   - src/mcp-server/server.ts
   - src/mcp-server/shared.ts
   - src/mcp-server/tools.ts
-  - src/mcp-server/tools/Alerts_list_alerts.ts
-  - src/mcp-server/tools/Incidents_create_incident.ts
-  - src/mcp-server/tools/Incidents_list_incidents.ts
-  - src/mcp-server/tools/Retrospectives_list_incident_retrospectives.ts
-  - src/mcp-server/tools/Retrospectives_update_incident_retrospective_field.ts
+  - src/mcp-server/tools/alertsListAlerts.ts
+  - src/mcp-server/tools/incidentsCreateIncident.ts
+  - src/mcp-server/tools/incidentsListIncidents.ts
+  - src/mcp-server/tools/retrospectivesListIncidentRetrospectives.ts
+  - src/mcp-server/tools/retrospectivesUpdateIncidentRetrospectiveField.ts
   - src/models/alertsalertentity.ts
   - src/models/alertsalertentitypaginated.ts
   - src/models/alertssirenalertentity.ts
@@ -121,6 +121,7 @@ generatedFiles:
   - src/models/nullableuserentity.ts
   - src/models/publicapiv1incidentssuccinctentity.ts
   - src/models/security.ts
+  - src/models/signalsapinotificationpolicyitemcomplianceentity.ts
   - src/models/succinctentity.ts
   - src/models/ticketingticketentity.ts
   - src/models/updateincidentretrospectivefield.ts

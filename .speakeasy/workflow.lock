@@ -1,9 +1,9 @@
-speakeasyVersion: 1.568.2
+speakeasyVersion: 1.580.1
 sources:
     FireHydrant-OAS:
         sourceNamespace: fire-hydrant-mcp-oas
-        sourceRevisionDigest: sha256:526c307421b9d50ac587aa4359b072cd4040c3e403f2d20925a110ddbce1857c
-        sourceBlobDigest: sha256:9f00b4f476b300749f5ff53a0ed931764b8924ca3c71e3e00095fa3b133f4d8a
+        sourceRevisionDigest: sha256:27b98de4282bd6866540b1813e11df49d491a5b0bea68c2f9e72a660f55b2438
+        sourceBlobDigest: sha256:9e4f68148c20742e7b47b9c0c3051b6eb15747bb939b7e63096b0215aeaa1f0e
         tags:
             - latest
             - 0.0.1
@@ -11,8 +11,8 @@ targets:
     fire-hydrant:
         source: FireHydrant-OAS
         sourceNamespace: fire-hydrant-mcp-oas
-        sourceRevisionDigest: sha256:526c307421b9d50ac587aa4359b072cd4040c3e403f2d20925a110ddbce1857c
-        sourceBlobDigest: sha256:9f00b4f476b300749f5ff53a0ed931764b8924ca3c71e3e00095fa3b133f4d8a
+        sourceRevisionDigest: sha256:27b98de4282bd6866540b1813e11df49d491a5b0bea68c2f9e72a660f55b2438
+        sourceBlobDigest: sha256:9e4f68148c20742e7b47b9c0c3051b6eb15747bb939b7e63096b0215aeaa1f0e
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
@@ -29,3 +29,6 @@ workflow:
         fire-hydrant:
             target: mcp-typescript
             source: FireHydrant-OAS
+            publish:
+                npm:
+                    token: $npm_token

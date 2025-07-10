@@ -1,7 +1,7 @@
 {
   "name": "firehydrant-mcp",
   "version": "0.0.1-beta.1",
-  "author": "Speakeasy",
+  "author": "FireHydrant",
   "type": "module",
   "sideEffects": false,
   "bin": {

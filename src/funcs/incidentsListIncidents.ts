@@ -3,7 +3,7 @@
  */
 
 import { FireHydrantCore } from "../core.js";
-import { encodeJSON, encodeSimple } from "../lib/encodings.js";
+import { encodeFormQuery } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -20,27 +20,27 @@ import {
 } from "../models/errors/httpclienterrors.js";
 import { SDKValidationError } from "../models/errors/sdkvalidationerror.js";
 import {
-  UpdateIncidentRetrospectiveFieldRequest,
-  UpdateIncidentRetrospectiveFieldRequest$zodSchema,
-  UpdateIncidentRetrospectiveFieldResponse,
-  UpdateIncidentRetrospectiveFieldResponse$zodSchema,
-} from "../models/updateincidentretrospectivefieldop.js";
+  ListIncidentsRequest,
+  ListIncidentsRequest$zodSchema,
+  ListIncidentsResponse,
+  ListIncidentsResponse$zodSchema,
+} from "../models/listincidentsop.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Update the value on a retrospective field
+ * List incidents
  *
  * @remarks
- * Update retrospective field value
+ * List all of the incidents in the organization
  */
-export function Retrospectives_update_incident_retrospective_field(
+export function incidentsListIncidents(
   client$: FireHydrantCore,
-  request: UpdateIncidentRetrospectiveFieldRequest,
+  request?: ListIncidentsRequest | undefined,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    UpdateIncidentRetrospectiveFieldResponse,
+    ListIncidentsResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -59,12 +59,12 @@ export function Retrospectives_update_incident_retrospective_field(
 
 async function $do(
   client$: FireHydrantCore,
-  request: UpdateIncidentRetrospectiveFieldRequest,
+  request?: ListIncidentsRequest | undefined,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      UpdateIncidentRetrospectiveFieldResponse,
+      ListIncidentsResponse,
       | APIError
       | SDKValidationError
       | UnexpectedClientError
@@ -78,42 +78,52 @@ async function $do(
 > {
   const parsed$ = safeParse(
     request,
-    (value$) => UpdateIncidentRetrospectiveFieldRequest$zodSchema.parse(value$),
+    (value$) => ListIncidentsRequest$zodSchema.optional().parse(value$),
     "Input validation failed",
   );
   if (!parsed$.ok) {
     return [parsed$, { status: "invalid" }];
   }
   const payload$ = parsed$.value;
-  const body$ = encodeJSON(
-    "body",
-    payload$.update_incident_retrospective_field,
-    { explode: true },
-  );
-
-  const pathParams$ = {
-    field_id: encodeSimple("field_id", payload$.field_id, {
-      explode: false,
-      charEncoding: "percent",
-    }),
-    incident_id: encodeSimple("incident_id", payload$.incident_id, {
-      explode: false,
-      charEncoding: "percent",
-    }),
-    retrospective_id: encodeSimple(
-      "retrospective_id",
-      payload$.retrospective_id,
-      { explode: false, charEncoding: "percent" },
-    ),
-  };
-  const path$ = pathToFunc(
-    "/v1/incidents/{incident_id}/retrospectives/{retrospective_id}/fields/{field_id}",
-  )(
-    pathParams$,
-  );
+  const body$ = null;
+  const path$ = pathToFunc("/v1/incidents")();
+  const query$ = encodeFormQuery({
+    "archived": payload$?.archived,
+    "assigned_teams": payload$?.assigned_teams,
+    "closed_at_or_after": payload$?.closed_at_or_after,
+    "closed_at_or_before": payload$?.closed_at_or_before,
+    "conditions": payload$?.conditions,
+    "created_at_or_after": payload$?.created_at_or_after,
+    "created_at_or_before": payload$?.created_at_or_before,
+    "current_milestones": payload$?.current_milestones,
+    "end_date": payload$?.end_date,
+    "environments": payload$?.environments,
+    "excluded_infrastructure_ids": payload$?.excluded_infrastructure_ids,
+    "functionalities": payload$?.functionalities,
+    "incident_type_id": payload$?.incident_type_id,
+    "name": payload$?.name,
+    "page": payload$?.page,
+    "per_page": payload$?.per_page,
+    "priorities": payload$?.priorities,
+    "priority_not_set": payload$?.priority_not_set,
+    "query": payload$?.query,
+    "resolved_at_or_after": payload$?.resolved_at_or_after,
+    "resolved_at_or_before": payload$?.resolved_at_or_before,
+    "retrospective_templates": payload$?.retrospective_templates,
+    "saved_search_id": payload$?.saved_search_id,
+    "services": payload$?.services,
+    "severities": payload$?.severities,
+    "severity_not_set": payload$?.severity_not_set,
+    "start_date": payload$?.start_date,
+    "status": payload$?.status,
+    "tag_match_strategy": payload$?.tag_match_strategy,
+    "tags": payload$?.tags,
+    "teams": payload$?.teams,
+    "updated_after": payload$?.updated_after,
+    "updated_before": payload$?.updated_before,
+  });
 
   const headers$ = new Headers(compactMap({
-    "Content-Type": "application/json",
     Accept: "application/json",
   }));
   const securityInput = await extractSecurity(client$._options.security);
@@ -121,7 +131,7 @@ async function $do(
 
   const context = {
     baseURL: options?.serverURL ?? client$._baseURL ?? "",
-    operationID: "update_incident_retrospective_field",
+    operationID: "list_incidents",
     oAuth2Scopes: [],
     resolvedSecurity: requestSecurity,
     securitySource: client$._options.security,
@@ -139,10 +149,11 @@ async function $do(
 
   const requestRes = client$._createRequest(context, {
     security: requestSecurity,
-    method: "PATCH",
+    method: "GET",
     baseURL: options?.serverURL,
     path: path$,
     headers: headers$,
+    query: query$,
     body: body$,
     timeoutMs: options?.timeoutMs || client$._options.timeoutMs
       || -1,
@@ -167,7 +178,7 @@ async function $do(
   };
 
   const [result$] = await M.match<
-    UpdateIncidentRetrospectiveFieldResponse,
+    ListIncidentsResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -176,8 +187,8 @@ async function $do(
     | RequestTimeoutError
     | ConnectionError
   >(
-    M.json(200, UpdateIncidentRetrospectiveFieldResponse$zodSchema, {
-      key: "Incidents_RetrospectiveFieldEntity",
+    M.json(200, ListIncidentsResponse$zodSchema, {
+      key: "IncidentEntityPaginated",
     }),
   )(response, req$, { extraFields: responseFields$ });
 

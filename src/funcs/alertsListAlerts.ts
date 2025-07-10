@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  * @remarks
  * Retrieve all alerts from third parties
  */
-export function Alerts_list_alerts(
+export function alertsListAlerts(
   client$: FireHydrantCore,
   request?: ListAlertsRequest | undefined,
   options?: RequestOptions,

@@ -15,11 +15,11 @@ import {
 import { MCPScope } from "./scopes.js";
 import { registerMCPExtensions } from "./server.extensions.js";
 import { createRegisterTool } from "./tools.js";
-import { tool$Alerts_list_alerts } from "./tools/Alerts_list_alerts.js";
-import { tool$Incidents_create_incident } from "./tools/Incidents_create_incident.js";
-import { tool$Incidents_list_incidents } from "./tools/Incidents_list_incidents.js";
-import { tool$Retrospectives_list_incident_retrospectives } from "./tools/Retrospectives_list_incident_retrospectives.js";
-import { tool$Retrospectives_update_incident_retrospective_field } from "./tools/Retrospectives_update_incident_retrospective_field.js";
+import { tool$alertsListAlerts } from "./tools/alertsListAlerts.js";
+import { tool$incidentsCreateIncident } from "./tools/incidentsCreateIncident.js";
+import { tool$incidentsListIncidents } from "./tools/incidentsListIncidents.js";
+import { tool$retrospectivesListIncidentRetrospectives } from "./tools/retrospectivesListIncidentRetrospectives.js";
+import { tool$retrospectivesUpdateIncidentRetrospectiveField } from "./tools/retrospectivesUpdateIncidentRetrospectiveField.js";
 
 export function createMCPServer(deps: {
   logger: ConsoleLogger;
@@ -61,11 +61,11 @@ export function createMCPServer(deps: {
   const register = { tool, resource, resourceTemplate, prompt };
   void register; // suppress unused warnings
 
-  tool(tool$Incidents_list_incidents);
-  tool(tool$Incidents_create_incident);
-  tool(tool$Retrospectives_list_incident_retrospectives);
-  tool(tool$Retrospectives_update_incident_retrospective_field);
-  tool(tool$Alerts_list_alerts);
+  tool(tool$incidentsListIncidents);
+  tool(tool$incidentsCreateIncident);
+  tool(tool$retrospectivesListIncidentRetrospectives);
+  tool(tool$retrospectivesUpdateIncidentRetrospectiveField);
+  tool(tool$alertsListAlerts);
 
   registerMCPExtensions(register satisfies Register);
 

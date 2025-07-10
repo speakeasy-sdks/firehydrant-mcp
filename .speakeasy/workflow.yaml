@@ -13,3 +13,6 @@ targets:
     fire-hydrant:
         target: mcp-typescript
         source: FireHydrant-OAS
+        publish:
+            npm:
+                token: $npm_token

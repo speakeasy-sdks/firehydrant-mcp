@@ -8,6 +8,7 @@ export type NullableSignalsAPITargetEntity = {
   id?: string | null | undefined;
   name?: string | null | undefined;
   type?: string | null | undefined;
+  team_id?: string | null | undefined;
   is_pageable?: boolean | null | undefined;
 };
 
@@ -19,5 +20,6 @@ export const NullableSignalsAPITargetEntity$zodSchema: z.ZodType<
   id: z.string().nullable().optional(),
   is_pageable: z.boolean().nullable().optional(),
   name: z.string().nullable().optional(),
+  team_id: z.string().nullable().optional(),
   type: z.string().nullable().optional(),
 });

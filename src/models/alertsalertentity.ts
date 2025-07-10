@@ -70,6 +70,7 @@ export type AlertsAlertEntity = {
   incidents?: Array<PublicApiv1IncidentsSuccinctEntity> | null | undefined;
   events?: Array<AlertsSirenEventEntity> | null | undefined;
   is_expired?: boolean | null | undefined;
+  is_noise?: boolean | null | undefined;
   parent_alerts?: Array<AlertsSirenAlertEntity> | null | undefined;
   child_alerts?: Array<AlertsSirenAlertEntity> | null | undefined;
   conversations?: Array<ConversationsAPIEntitiesReference> | null | undefined;
@@ -94,6 +95,7 @@ export const AlertsAlertEntity$zodSchema: z.ZodType<
     .optional(),
   integration_name: z.string().nullable().optional(),
   is_expired: z.boolean().nullable().optional(),
+  is_noise: z.boolean().nullable().optional(),
   labels: z.lazy(() => AlertsAlertEntityLabels$zodSchema).nullable().optional(),
   parent_alerts: z.array(AlertsSirenAlertEntity$zodSchema).nullable()
     .optional(),

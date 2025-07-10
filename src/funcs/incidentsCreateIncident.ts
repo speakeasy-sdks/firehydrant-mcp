@@ -36,7 +36,7 @@ import { Result } from "../types/fp.js";
  * @remarks
  * Create a new incident
  */
-export function Incidents_create_incident(
+export function incidentsCreateIncident(
   client$: FireHydrantCore,
   request: CreateIncident,
   options?: RequestOptions,
