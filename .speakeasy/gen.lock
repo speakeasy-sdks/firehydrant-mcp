@@ -3,10 +3,11 @@ id: 0dd544ca-3933-4c41-a5b5-b9a57ec94099
 management:
   docChecksum: 45bf20c20c51a13baf0693dd7342eb87
   docVersion: 0.0.1
-  speakeasyVersion: 1.580.1
-  generationVersion: 2.656.3
-  releaseVersion: 0.0.1-beta.2
-  configChecksum: 562f2dd5bd5c9664fae962c8b5a2837f
+  speakeasyVersion: 1.581.0
+  generationVersion: 2.656.5
+  releaseVersion: 0.0.1-beta.3
+  configChecksum: 31d48a86fb7601f7ded0e5b6127ba2a6
+  repoURL: https://github.com/firehydrant/firehydrant-mcp.git
 features:
   mcp-typescript:
     additionalDependencies: 0.1.0
