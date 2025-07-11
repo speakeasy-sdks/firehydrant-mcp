@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 0dd544ca-3933-4c41-a5b5-b9a57ec94099
 management:
-  docChecksum: 45bf20c20c51a13baf0693dd7342eb87
+  docChecksum: 909f44efdfd75f9cbcc07861d480bb5c
   docVersion: 0.0.1
   speakeasyVersion: 1.581.0
   generationVersion: 2.656.5
-  releaseVersion: 0.0.1-beta.3
-  configChecksum: 31d48a86fb7601f7ded0e5b6127ba2a6
+  releaseVersion: 0.0.1-beta.4
+  configChecksum: 304bb07d3e93439f7c25080e25132faf
   repoURL: https://github.com/firehydrant/firehydrant-mcp.git
 features:
   mcp-typescript:
