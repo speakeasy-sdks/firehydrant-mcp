@@ -1,4 +1,4 @@
-speakeasyVersion: 1.580.1
+speakeasyVersion: 1.581.0
 sources:
     FireHydrant-OAS:
         sourceNamespace: fire-hydrant-mcp-oas
@@ -6,6 +6,7 @@ sources:
         sourceBlobDigest: sha256:9e4f68148c20742e7b47b9c0c3051b6eb15747bb939b7e63096b0215aeaa1f0e
         tags:
             - latest
+            - speakeasy-sdk-regen-1752255286
             - 0.0.1
 targets:
     fire-hydrant:
