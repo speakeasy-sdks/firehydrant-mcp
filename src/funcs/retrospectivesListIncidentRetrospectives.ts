@@ -3,7 +3,7 @@
  */
 
 import { FireHydrantCore } from "../core.js";
-import { encodeFormQuery } from "../lib/encodings.js";
+import { encodeFormQuery, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -20,27 +20,27 @@ import {
 } from "../models/errors/httpclienterrors.js";
 import { SDKValidationError } from "../models/errors/sdkvalidationerror.js";
 import {
-  ListIncidentsRequest,
-  ListIncidentsRequest$zodSchema,
-  ListIncidentsResponse,
-  ListIncidentsResponse$zodSchema,
-} from "../models/listincidentsop.js";
+  ListIncidentRetrospectivesRequest,
+  ListIncidentRetrospectivesRequest$zodSchema,
+  ListIncidentRetrospectivesResponse,
+  ListIncidentRetrospectivesResponse$zodSchema,
+} from "../models/listincidentretrospectivesop.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * List incidents
+ * All attached retrospectives for an incident
  *
  * @remarks
- * List all of the incidents in the organization
+ * Retrieve retrospectives attached to an incident
  */
-export function Incidents_list_incidents(
+export function retrospectivesListIncidentRetrospectives(
   client$: FireHydrantCore,
-  request?: ListIncidentsRequest | undefined,
+  request: ListIncidentRetrospectivesRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    ListIncidentsResponse,
+    ListIncidentRetrospectivesResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -59,12 +59,12 @@ export function Incidents_list_incidents(
 
 async function $do(
   client$: FireHydrantCore,
-  request?: ListIncidentsRequest | undefined,
+  request: ListIncidentRetrospectivesRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      ListIncidentsResponse,
+      ListIncidentRetrospectivesResponse,
       | APIError
       | SDKValidationError
       | UnexpectedClientError
@@ -78,7 +78,7 @@ async function $do(
 > {
   const parsed$ = safeParse(
     request,
-    (value$) => ListIncidentsRequest$zodSchema.optional().parse(value$),
+    (value$) => ListIncidentRetrospectivesRequest$zodSchema.parse(value$),
     "Input validation failed",
   );
   if (!parsed$.ok) {
@@ -86,41 +86,20 @@ async function $do(
   }
   const payload$ = parsed$.value;
   const body$ = null;
-  const path$ = pathToFunc("/v1/incidents")();
+
+  const pathParams$ = {
+    incident_id: encodeSimple("incident_id", payload$.incident_id, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+  };
+  const path$ = pathToFunc("/v1/incidents/{incident_id}/retrospectives")(
+    pathParams$,
+  );
   const query$ = encodeFormQuery({
-    "archived": payload$?.archived,
-    "assigned_teams": payload$?.assigned_teams,
-    "closed_at_or_after": payload$?.closed_at_or_after,
-    "closed_at_or_before": payload$?.closed_at_or_before,
-    "conditions": payload$?.conditions,
-    "created_at_or_after": payload$?.created_at_or_after,
-    "created_at_or_before": payload$?.created_at_or_before,
-    "current_milestones": payload$?.current_milestones,
-    "end_date": payload$?.end_date,
-    "environments": payload$?.environments,
-    "excluded_infrastructure_ids": payload$?.excluded_infrastructure_ids,
-    "functionalities": payload$?.functionalities,
-    "incident_type_id": payload$?.incident_type_id,
-    "name": payload$?.name,
-    "page": payload$?.page,
-    "per_page": payload$?.per_page,
-    "priorities": payload$?.priorities,
-    "priority_not_set": payload$?.priority_not_set,
-    "query": payload$?.query,
-    "resolved_at_or_after": payload$?.resolved_at_or_after,
-    "resolved_at_or_before": payload$?.resolved_at_or_before,
-    "retrospective_templates": payload$?.retrospective_templates,
-    "saved_search_id": payload$?.saved_search_id,
-    "services": payload$?.services,
-    "severities": payload$?.severities,
-    "severity_not_set": payload$?.severity_not_set,
-    "start_date": payload$?.start_date,
-    "status": payload$?.status,
-    "tag_match_strategy": payload$?.tag_match_strategy,
-    "tags": payload$?.tags,
-    "teams": payload$?.teams,
-    "updated_after": payload$?.updated_after,
-    "updated_before": payload$?.updated_before,
+    "is_hidden": payload$.is_hidden,
+    "page": payload$.page,
+    "per_page": payload$.per_page,
   });
 
   const headers$ = new Headers(compactMap({
@@ -131,7 +110,7 @@ async function $do(
 
   const context = {
     baseURL: options?.serverURL ?? client$._baseURL ?? "",
-    operationID: "list_incidents",
+    operationID: "list_incident_retrospectives",
     oAuth2Scopes: [],
     resolvedSecurity: requestSecurity,
     securitySource: client$._options.security,
@@ -178,7 +157,7 @@ async function $do(
   };
 
   const [result$] = await M.match<
-    ListIncidentsResponse,
+    ListIncidentRetrospectivesResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -187,8 +166,8 @@ async function $do(
     | RequestTimeoutError
     | ConnectionError
   >(
-    M.json(200, ListIncidentsResponse$zodSchema, {
-      key: "IncidentEntityPaginated",
+    M.json(200, ListIncidentRetrospectivesResponse$zodSchema, {
+      key: "Incidents_RetrospectiveEntityPaginated",
     }),
   )(response, req$, { extraFields: responseFields$ });
 

@@ -3,6 +3,10 @@
  */
 
 import * as z from "zod";
+import {
+  SignalsAPINotificationPolicyItemComplianceEntity,
+  SignalsAPINotificationPolicyItemComplianceEntity$zodSchema,
+} from "./signalsapinotificationpolicyitemcomplianceentity.js";
 
 /**
  * UserEntity model
@@ -16,6 +20,10 @@ export type NullableUserEntity = {
   created_at?: string | null | undefined;
   updated_at?: string | null | undefined;
   signals_enabled_notification_types?: Array<string> | null | undefined;
+  signals_notification_policy_compliance?:
+    | Array<SignalsAPINotificationPolicyItemComplianceEntity>
+    | null
+    | undefined;
 };
 
 export const NullableUserEntity$zodSchema: z.ZodType<
@@ -28,6 +36,9 @@ export const NullableUserEntity$zodSchema: z.ZodType<
   id: z.string().nullable().optional(),
   name: z.string().nullable().optional(),
   signals_enabled_notification_types: z.array(z.string()).nullable().optional(),
+  signals_notification_policy_compliance: z.array(
+    SignalsAPINotificationPolicyItemComplianceEntity$zodSchema,
+  ).nullable().optional(),
   slackLinked: z.boolean().nullable().optional(),
   slack_user_id: z.string().nullable().optional(),
   updated_at: z.string().datetime({ offset: true }).nullable().optional(),

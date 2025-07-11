@@ -3,7 +3,7 @@
  */
 
 import { FireHydrantCore } from "../core.js";
-import { encodeFormQuery, encodeSimple } from "../lib/encodings.js";
+import { encodeJSON, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -20,27 +20,27 @@ import {
 } from "../models/errors/httpclienterrors.js";
 import { SDKValidationError } from "../models/errors/sdkvalidationerror.js";
 import {
-  ListIncidentRetrospectivesRequest,
-  ListIncidentRetrospectivesRequest$zodSchema,
-  ListIncidentRetrospectivesResponse,
-  ListIncidentRetrospectivesResponse$zodSchema,
-} from "../models/listincidentretrospectivesop.js";
+  UpdateIncidentRetrospectiveFieldRequest,
+  UpdateIncidentRetrospectiveFieldRequest$zodSchema,
+  UpdateIncidentRetrospectiveFieldResponse,
+  UpdateIncidentRetrospectiveFieldResponse$zodSchema,
+} from "../models/updateincidentretrospectivefieldop.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * All attached retrospectives for an incident
+ * Update the value on a retrospective field
  *
  * @remarks
- * Retrieve retrospectives attached to an incident
+ * Update retrospective field value
  */
-export function Retrospectives_list_incident_retrospectives(
+export function retrospectivesUpdateIncidentRetrospectiveField(
   client$: FireHydrantCore,
-  request: ListIncidentRetrospectivesRequest,
+  request: UpdateIncidentRetrospectiveFieldRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    ListIncidentRetrospectivesResponse,
+    UpdateIncidentRetrospectiveFieldResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -59,12 +59,12 @@ export function Retrospectives_list_incident_retrospectives(
 
 async function $do(
   client$: FireHydrantCore,
-  request: ListIncidentRetrospectivesRequest,
+  request: UpdateIncidentRetrospectiveFieldRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      ListIncidentRetrospectivesResponse,
+      UpdateIncidentRetrospectiveFieldResponse,
       | APIError
       | SDKValidationError
       | UnexpectedClientError
@@ -78,31 +78,42 @@ async function $do(
 > {
   const parsed$ = safeParse(
     request,
-    (value$) => ListIncidentRetrospectivesRequest$zodSchema.parse(value$),
+    (value$) => UpdateIncidentRetrospectiveFieldRequest$zodSchema.parse(value$),
     "Input validation failed",
   );
   if (!parsed$.ok) {
     return [parsed$, { status: "invalid" }];
   }
   const payload$ = parsed$.value;
-  const body$ = null;
+  const body$ = encodeJSON(
+    "body",
+    payload$.update_incident_retrospective_field,
+    { explode: true },
+  );
 
   const pathParams$ = {
+    field_id: encodeSimple("field_id", payload$.field_id, {
+      explode: false,
+      charEncoding: "percent",
+    }),
     incident_id: encodeSimple("incident_id", payload$.incident_id, {
       explode: false,
       charEncoding: "percent",
     }),
+    retrospective_id: encodeSimple(
+      "retrospective_id",
+      payload$.retrospective_id,
+      { explode: false, charEncoding: "percent" },
+    ),
   };
-  const path$ = pathToFunc("/v1/incidents/{incident_id}/retrospectives")(
+  const path$ = pathToFunc(
+    "/v1/incidents/{incident_id}/retrospectives/{retrospective_id}/fields/{field_id}",
+  )(
     pathParams$,
   );
-  const query$ = encodeFormQuery({
-    "is_hidden": payload$.is_hidden,
-    "page": payload$.page,
-    "per_page": payload$.per_page,
-  });
 
   const headers$ = new Headers(compactMap({
+    "Content-Type": "application/json",
     Accept: "application/json",
   }));
   const securityInput = await extractSecurity(client$._options.security);
@@ -110,7 +121,7 @@ async function $do(
 
   const context = {
     baseURL: options?.serverURL ?? client$._baseURL ?? "",
-    operationID: "list_incident_retrospectives",
+    operationID: "update_incident_retrospective_field",
     oAuth2Scopes: [],
     resolvedSecurity: requestSecurity,
     securitySource: client$._options.security,
@@ -128,11 +139,10 @@ async function $do(
 
   const requestRes = client$._createRequest(context, {
     security: requestSecurity,
-    method: "GET",
+    method: "PATCH",
     baseURL: options?.serverURL,
     path: path$,
     headers: headers$,
-    query: query$,
     body: body$,
     timeoutMs: options?.timeoutMs || client$._options.timeoutMs
       || -1,
@@ -157,7 +167,7 @@ async function $do(
   };
 
   const [result$] = await M.match<
-    ListIncidentRetrospectivesResponse,
+    UpdateIncidentRetrospectiveFieldResponse,
     | APIError
     | SDKValidationError
     | UnexpectedClientError
@@ -166,8 +176,8 @@ async function $do(
     | RequestTimeoutError
     | ConnectionError
   >(
-    M.json(200, ListIncidentRetrospectivesResponse$zodSchema, {
-      key: "Incidents_RetrospectiveEntityPaginated",
+    M.json(200, UpdateIncidentRetrospectiveFieldResponse$zodSchema, {
+      key: "Incidents_RetrospectiveFieldEntity",
     }),
   )(response, req$, { extraFields: responseFields$ });
 

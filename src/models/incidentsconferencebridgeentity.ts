@@ -25,6 +25,7 @@ export type IncidentsConferenceBridgeEntity = {
   language_codes?: Array<string> | null | undefined;
   transcription_status?: string | null | undefined;
   transcription_sub_code?: string | null | undefined;
+  previous_host_assignment?: string | null | undefined;
 };
 
 export const IncidentsConferenceBridgeEntity$zodSchema: z.ZodType<
@@ -38,6 +39,7 @@ export const IncidentsConferenceBridgeEntity$zodSchema: z.ZodType<
   has_translated_transcripts: z.boolean().nullable().optional(),
   id: z.string().nullable().optional(),
   language_codes: z.array(z.string()).nullable().optional(),
+  previous_host_assignment: z.string().nullable().optional(),
   transcription_status: z.string().nullable().optional(),
   transcription_sub_code: z.string().nullable().optional(),
 }).describe("Incidents_ConferenceBridgeEntity model");
