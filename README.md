@@ -9,11 +9,6 @@ Model Context Protocol (MCP) Server for the *FireHydrant* API.
     </a>
 </div>
 
-
-<br /><br />
-> [!IMPORTANT]
-> This MCP Server is not yet ready for production use. To complete setup please follow the steps outlined in your [workspace](https://app.speakeasy.com/org/firehydrant/firehydrant). Delete this notice before publishing to a package manager.
-
 <!-- Start Summary [summary] -->
 ## Summary
 
@@ -32,9 +27,6 @@ FireHydrant MCP Server: An MCP server for interacting with FireHydrant's API.
 
 <!-- Start Installation [installation] -->
 ## Installation
-
-> [!TIP]
-> To finish publishing your MCP Server to npm and others you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide).
 
 ### Claude
 
