@@ -8007,7 +8007,6 @@ components:
           nullable: true
         "delay_duration":
           type: "string"
-          format: "date-time"
           nullable: true
         "action": {"$ref": "#/components/schemas/NullableRunbooks_ActionsEntity"}
         "reruns":
@@ -8018,7 +8017,6 @@ components:
           nullable: true
         "repeats_duration":
           type: "string"
-          format: "date-time"
           nullable: true
         "votes": {"$ref": "#/components/schemas/NullableVotesEntity"}
         "rule": {"$ref": "#/components/schemas/NullableRules_RuleEntity"}
