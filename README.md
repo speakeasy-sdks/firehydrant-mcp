@@ -28,9 +28,6 @@ FireHydrant MCP Server: An MCP server for interacting with FireHydrant's API.
 <!-- Start Installation [installation] -->
 ## Installation
 
-> [!TIP]
-> To finish publishing your MCP Server to npm and others you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide).
-
 ### Claude
 
 Add the following server definition to your `claude_desktop_config.json` file:
@@ -71,37 +68,6 @@ Create a `.cursor/mcp.json` file in your project root with the following content
 }
 ```
 
-### Standalone Binary
-
-Run the MCP server as a standalone binary with no additional dependencies. Pull these binaries from available Github releases:
-
-```bash
-curl -L -o mcp-server \
-    https://github.com/{org}/{repo}/releases/download/{tag}/mcp-server-bun-darwin-arm64 && \
-chmod +x mcp-server
-```
-
-If the repo is a private repo you must add your Github PAT to download a release `-H "Authorization: Bearer {GITHUB_PAT}"`.
-
-```json
-{
-  "mcpServers": {
-    "Todos": {
-      "command": "./DOWNLOAD/PATH/mcp-server",
-      "args": [
-        "start"
-      ]
-    }
-  }
-}
-```
-
-For a full list of server arguments, run:
-
-```bash
-npx -y --package firehydrant-mcp -- mcp start --help
-```
-
 ### Package Managers
 
 The MCP Server can be installed with either [npm](https://www.npmjs.com/), [pnpm](https://pnpm.io/), [bun](https://bun.sh/) or [yarn](https://classic.yarnpkg.com/en/) package managers.
@@ -109,25 +75,25 @@ The MCP Server can be installed with either [npm](https://www.npmjs.com/), [pnpm
 #### NPM
 
 ```bash
-npm add <UNSET>
+npm add firehydrant-mcp
 ```
 
 #### PNPM
 
 ```bash
-pnpm add <UNSET>
+pnpm add firehydrant-mcp
 ```
 
 #### Bun
 
 ```bash
-bun add <UNSET>
+bun add firehydrant-mcp
 ```
 
 #### Yarn
 
 ```bash
-yarn add <UNSET>
+yarn add firehydrant-mcp
 ```
 <!-- End Installation [installation] -->
 
