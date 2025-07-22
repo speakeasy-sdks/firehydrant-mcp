@@ -1,3 +1,5 @@
+.dev.vars
+.wrangler/
 **/.speakeasy/logs/
 **/.speakeasy/reports/
 **/.speakeasy/temp/

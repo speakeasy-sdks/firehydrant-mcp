@@ -25,20 +25,22 @@ export function createMCPServer(deps: {
   logger: ConsoleLogger;
   allowedTools?: string[] | undefined;
   scopes?: MCPScope[] | undefined;
+  getSDK?: () => FireHydrantCore;
   serverURL?: string | undefined;
   security?: SDKOptions["security"] | undefined;
   serverIdx?: SDKOptions["serverIdx"] | undefined;
 }) {
   const server = new McpServer({
     name: "FireHydrant",
-    version: "0.0.1-beta.7",
+    version: "0.0.1-beta.10",
   });
 
-  const client = new FireHydrantCore({
-    security: deps.security,
-    serverURL: deps.serverURL,
-    serverIdx: deps.serverIdx,
-  });
+  const getClient = deps.getSDK || (() =>
+    new FireHydrantCore({
+      security: deps.security,
+      serverURL: deps.serverURL,
+      serverIdx: deps.serverIdx,
+    }));
 
   const scopes = new Set(deps.scopes);
 
@@ -46,18 +48,23 @@ export function createMCPServer(deps: {
   const tool = createRegisterTool(
     deps.logger,
     server,
-    client,
+    getClient,
     scopes,
     allowedTools,
   );
-  const resource = createRegisterResource(deps.logger, server, client, scopes);
+  const resource = createRegisterResource(
+    deps.logger,
+    server,
+    getClient,
+    scopes,
+  );
   const resourceTemplate = createRegisterResourceTemplate(
     deps.logger,
     server,
-    client,
+    getClient,
     scopes,
   );
-  const prompt = createRegisterPrompt(deps.logger, server, client, scopes);
+  const prompt = createRegisterPrompt(deps.logger, server, getClient, scopes);
   const register = { tool, resource, resourceTemplate, prompt };
   void register; // suppress unused warnings
 
