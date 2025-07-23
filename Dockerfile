@@ -1,29 +1,40 @@
-# Build stage
-FROM node:slim AS builder
+###
+# This Dockerfile builds the Express wrapper for the MCP server, and then runs
+# it. It uses bun's build system to compile the TypeScript code into a small,
+# efficient executable.
+##
+
+# Use a multi-stage build to keep the final image small
+FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
 
 # Copy package files for better layer caching
+COPY package.json package-lock.json ./
+
+# Copy source code
 COPY . .
 
-# Install all dependencies (including dev dependencies for building)
-RUN npm ci
+RUN <<EOF
+# Clean install dependencies using npm
+npm ci
+# Bundle to a single executable using bun
+npm exec bun build ./src/express-server.ts -- --compile --outfile=express-server
+EOF
 
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM node:slim AS production
-
-WORKDIR /app
-
-# Copy built application from builder stage
-COPY --from=builder /app/bin ./bin
+# Use a minimal base image for the final stage
+# The executable does not require node/bun to run
+FROM debian:bookworm-slim AS runner
 
 # Create non-root user for security
 RUN groupadd -r mcp && useradd -r -g mcp mcp
 USER mcp
 
-EXPOSE 2718
+WORKDIR /app
 
-# CMD ["node", "bin/mcp-server.js", "start", "--transport", "sse", "--port", "2718"]
+# Copy the built application from the builder stage
+COPY --from=builder /app/express-server ./express-server
+
+EXPOSE 3000
+
+CMD ["./express-server"]

@@ -1,12 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { NextFunction, Request, Response } from "express";
-import { FireHydrantCore } from "../core.js";
-import { createConsoleLogger } from "./console-logger.js";
-import { createMCPServer } from "./server.js";
+import { createMCPServer } from "./mcp-server/server.js";
+import { createConsoleLogger } from "./mcp-server/console-logger.js";
+import { FireHydrantCore } from "./core.js";
 
 type Props = Record<string, string>;
+
+class HTTPError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.name = "HTTPError";
+  }
+}
 
 declare global {
   namespace Express {
@@ -20,30 +29,28 @@ declare global {
 const app = express();
 
 // Middleware to extract Authorization header
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req, _res, next) => {
   const authorizationHeader = req.headers["authorization"];
 
   if (typeof authorizationHeader !== "string") {
     console.error("Authorization header is missing or not a string");
-    const err = new Error("Authorization header is required");
-    err.status = 401;
-    throw err;
+    const err = new HTTPError(401, "Authorization header is required");
+    return next(err);
   } else if (authorizationHeader.length === 0) {
     console.error("Invalid Authorization header: empty string");
-    const err = new Error("Authorization header cannot be empty");
-    err.status = 401;
-    throw err;
+    const err = new HTTPError(401, "Authorization header cannot be empty");
+    return next(err);
   }
 
   const mcpServer = createMCPServer({
     logger: createConsoleLogger("debug"),
     getSDK: () =>
       new FireHydrantCore({
-        debugLogger: {
-          log: (...args) => console.log(...args),
-          group: (...args) => console.group(...args),
-          groupEnd: (...args) => console.groupEnd(...args),
-        },
+        // debugLogger: {
+        //   log: (...args) => console.log(...args),
+        //   group: (...args) => console.group(...args),
+        //   groupEnd: (...args) => console.groupEnd(...args),
+        // },
         security: {
           api_key: (req.headers["authorization"] as string) || "",
         },
@@ -57,14 +64,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 const transportMap = new Map<string, SSEServerTransport>();
 
-// Basic error handling
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+// Error handling middleware
+app.use((err: HTTPError, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Server error:", err.message);
-  res.status(500).json({ error: "Internal server error" });
+  const status = err.status || 500;
+  const message = status === 500 ? "Internal server error" : err.message;
+  res.status(status).json({ error: message });
 });
 
 app.get("/sse", async (req: Request, res: Response) => {
-  console.log("SSE connection established");
   res.setHeader("Content-Type", "text/event-stream");
   const transport = new SSEServerTransport("/message", res);
   transportMap.set(transport.sessionId, transport);
@@ -72,7 +80,6 @@ app.get("/sse", async (req: Request, res: Response) => {
 });
 
 app.post("/message", (req, res) => {
-  console.log("Received message on /messages endpoint");
   const sessionId = req.query["sessionId"];
 
   if (!sessionId) {
