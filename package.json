@@ -1,6 +1,6 @@
 {
   "name": "firehydrant-mcp",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.10",
   "author": "FireHydrant",
   "type": "module",
   "sideEffects": false,
@@ -13,6 +13,9 @@
   },
   "scripts": {
     "build": "bun src/mcp-server/build.mts && tsc",
+    "types": "wrangler types",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
     "check": "npm run lint",
     "lint": "eslint --cache --max-warnings=0 src",
     "prepublishOnly": "npm run build"
@@ -20,11 +23,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.5",
     "@stricli/core": "^1.1.2",
+    "agents": "^0.0.105",
     "bun": "^1.2.12",
     "express": "^5.1.0",
     "zod": "^3.25.7"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250712.0",
     "@eslint/js": "^9.26.0",
     "@types/bun": "^1.2.13",
     "@types/express": "^5.0.1",
@@ -32,6 +37,7 @@
     "eslint": "^9.26.0",
     "globals": "^16.0.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.1"
+    "typescript-eslint": "^8.31.1",
+    "wrangler": "^4.24.3"
   }
 }

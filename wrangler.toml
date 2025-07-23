@@ -1,0 +1,21 @@
+
+name = "firehydrant-mcp-mcp-server"
+main = "src/cloudflare-worker.ts"
+compatibility_date = "2025-07-15"
+
+# Enable node compatibility for MCP SDK
+compatibility_flags = ["nodejs_compat"]
+
+# Durable Object binding for MCP Agent
+[[durable_objects.bindings]]
+name = "FIREHYDRANT-MCP_MCP"
+class_name = "FirehydrantMcpMCP"
+
+# Durable Object migration
+[[migrations]]
+tag = "v1"
+new_classes = ["FirehydrantMcpMCP"]
+
+# Development configuration
+[dev]
+port = 8787

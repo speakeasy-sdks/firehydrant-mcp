@@ -32,5 +32,5 @@
     "useUnknownInCatchVariables": true,
   },
   "exclude": ["node_modules"],
-  "include": ["src"]
+  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }
