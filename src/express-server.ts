@@ -1,9 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import {
+  InitializeRequest,
+  InitializeRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { randomUUID } from "crypto";
 import express, { NextFunction, Request, Response } from "express";
-import { createMCPServer } from "./mcp-server/server.js";
-import { createConsoleLogger } from "./mcp-server/console-logger.js";
 import { FireHydrantCore } from "./core.js";
+import { createConsoleLogger } from "./mcp-server/console-logger.js";
+import { createMCPServer } from "./mcp-server/server.js";
 
 type Props = Record<string, string>;
 
@@ -26,7 +31,18 @@ declare global {
   }
 }
 
+const httpTransportMap = new Map<string, StreamableHTTPServerTransport>();
+
+function isInitializeReq(body: unknown): body is InitializeRequest {
+  const isInitial = (data: unknown): boolean =>
+    InitializeRequestSchema.safeParse(data).success;
+
+  if (Array.isArray(body)) return body.some(isInitial);
+  return isInitial(body);
+}
+
 const app = express();
+app.use(express.json());
 
 // Middleware to extract Authorization header
 app.use((req, _res, next) => {
@@ -46,11 +62,6 @@ app.use((req, _res, next) => {
     logger: createConsoleLogger("debug"),
     getSDK: () =>
       new FireHydrantCore({
-        // debugLogger: {
-        //   log: (...args) => console.log(...args),
-        //   group: (...args) => console.group(...args),
-        //   groupEnd: (...args) => console.groupEnd(...args),
-        // },
         security: {
           api_key: (req.headers["authorization"] as string) || "",
         },
@@ -62,8 +73,6 @@ app.use((req, _res, next) => {
   next();
 });
 
-const transportMap = new Map<string, SSEServerTransport>();
-
 // Error handling middleware
 app.use((err: HTTPError, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Server error:", err.message);
@@ -72,37 +81,51 @@ app.use((err: HTTPError, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status).json({ error: message });
 });
 
-app.get("/sse", async (req: Request, res: Response) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  const transport = new SSEServerTransport("/message", res);
-  transportMap.set(transport.sessionId, transport);
-  await req.mcpServer.connect(transport);
-});
-
-app.post("/message", (req, res) => {
-  const sessionId = req.query["sessionId"];
+app.get("/mcp", async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"] as string | undefined;
 
   if (!sessionId) {
-    console.error("Message received without sessionId");
-    res.status(400).json({ error: "sessionId is required" });
+    console.error("mcp-session-id header is required");
+    res.status(400).json({ error: "mcp-session-id header is required" });
     return;
   }
 
-  if (typeof sessionId !== "string") {
-    console.error("sessionId must be a string");
-    res.status(400).json({ error: "sessionId must be a string" });
-    return;
-  }
-
-  const transport = transportMap.get(sessionId as string);
-
+  const transport = httpTransportMap.get(sessionId);
   if (!transport) {
     console.error(`No transport found for sessionId: ${sessionId}`);
-    res.status(404).json({ error: "Transport not found" });
+    res.status(400).json({ error: "Transport not found" });
     return;
   }
 
-  transport.handlePostMessage(req, res);
+  await transport.handleRequest(req, res, req.body);
+  // ?TODO: this.streamMessages(transport)
+});
+
+app.post("/mcp", async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"] as string | undefined;
+
+  if (!sessionId && isInitializeReq(req.body)) {
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+    });
+
+    await req.mcpServer.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+
+    const sessionId = transport.sessionId;
+    if (sessionId) {
+      httpTransportMap.set(sessionId, transport);
+    }
+    return;
+  }
+
+  const transport = sessionId ? httpTransportMap.get(sessionId) : undefined;
+  if (transport) {
+    await transport.handleRequest(req, res, req.body);
+    return;
+  }
+
+  res.status(400).json({ error: "Invalid session ID or method" });
 });
 
 app.get("/", (_req: Request, res: Response) => {
@@ -113,6 +136,11 @@ app.get("/", (_req: Request, res: Response) => {
 
 const PORT = process.env["PORT"] || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app
+  .listen(PORT, () => {})
+  .on("error", (err) => {
+    console.error(`Error starting server: "${err.message}"`);
+  })
+  .on("listening", () => {
+    console.log(`Server is listening on port ${PORT}`);
+  });
