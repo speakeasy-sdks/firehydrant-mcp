@@ -12,6 +12,24 @@ import { createMCPServer } from "./mcp-server/server.js";
 
 type Props = Record<string, string>;
 
+// Constants
+const HEADERS = {
+  AUTHORIZATION: "authorization",
+  SESSION_ID: "mcp-session-id",
+} as const;
+
+const DEFAULT_PORT = 3000;
+const LOG_LEVEL = "debug";
+
+const ERROR_MESSAGES = {
+  AUTH_REQUIRED: "Authorization header is required",
+  AUTH_EMPTY: "Authorization header cannot be empty",
+  SESSION_REQUIRED: "mcp-session-id header is required",
+  TRANSPORT_NOT_FOUND: "Transport not found",
+  INVALID_SESSION: "Invalid session ID or method",
+  INTERNAL_ERROR: "Internal server error",
+} as const;
+
 class HTTPError extends Error {
   status: number;
 
@@ -22,6 +40,7 @@ class HTTPError extends Error {
   }
 }
 
+// Extended Express Request interface
 declare global {
   namespace Express {
     interface Request {
@@ -31,8 +50,14 @@ declare global {
   }
 }
 
-const httpTransportMap = new Map<string, StreamableHTTPServerTransport>();
+// Transport storage
+type TransportMap = Map<string, StreamableHTTPServerTransport>;
 
+const httpTransportMap: TransportMap = new Map();
+
+/**
+ * Type guard to check if request body contains an initialize request
+ */
 function isInitializeReq(body: unknown): body is InitializeRequest {
   const isInitial = (data: unknown): boolean =>
     InitializeRequestSchema.safeParse(data).success;
@@ -41,100 +66,158 @@ function isInitializeReq(body: unknown): body is InitializeRequest {
   return isInitial(body);
 }
 
-const app = express();
-app.use(express.json());
-
-// Middleware to extract Authorization header
-app.use((req, _res, next) => {
-  const authorizationHeader = req.headers["authorization"];
-
-  if (typeof authorizationHeader !== "string") {
+/**
+ * Validates authorization header and returns it if valid
+ */
+function validateAuthHeader(authHeader: unknown): string {
+  if (typeof authHeader !== "string") {
     console.error("Authorization header is missing or not a string");
-    const err = new HTTPError(401, "Authorization header is required");
-    return next(err);
-  } else if (authorizationHeader.length === 0) {
-    console.error("Invalid Authorization header: empty string");
-    const err = new HTTPError(401, "Authorization header cannot be empty");
-    return next(err);
+    throw new HTTPError(401, ERROR_MESSAGES.AUTH_REQUIRED);
   }
 
-  const mcpServer = createMCPServer({
-    logger: createConsoleLogger("debug"),
+  if (authHeader.length === 0) {
+    console.error("Invalid Authorization header: empty string");
+    throw new HTTPError(401, ERROR_MESSAGES.AUTH_EMPTY);
+  }
+
+  return authHeader;
+}
+
+/**
+ * Creates a new MCP server instance with the provided API key
+ */
+function createMCPServerInstance(apiKey: string): McpServer {
+  return createMCPServer({
+    logger: createConsoleLogger(LOG_LEVEL),
     getSDK: () =>
       new FireHydrantCore({
         security: {
-          api_key: (req.headers["authorization"] as string) || "",
+          api_key: apiKey,
         },
       }),
   });
+}
 
-  req.mcpServer = mcpServer;
+/**
+ * Validates session ID header and returns it if valid
+ */
+function validateSessionId(sessionId: unknown): string {
+  if (typeof sessionId !== "string") {
+    throw new HTTPError(400, ERROR_MESSAGES.SESSION_REQUIRED);
+  }
+  return sessionId;
+}
 
-  next();
+/**
+ * Gets transport for session ID or throws error if not found
+ */
+function getTransportForSession(
+  sessionId: string,
+): StreamableHTTPServerTransport {
+  const httpTransport = httpTransportMap.get(sessionId);
+  if (!httpTransport) {
+    console.error(`No transport found for sessionId: ${sessionId}`);
+    throw new HTTPError(400, ERROR_MESSAGES.TRANSPORT_NOT_FOUND);
+  }
+  return httpTransport;
+}
+
+/**
+ * Creates a new transport and connects it to the MCP server
+ */
+async function createAndConnectTransport(
+  mcpServer: McpServer,
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const httpTransport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: () => randomUUID(),
+  });
+
+  await mcpServer.connect(httpTransport);
+  await httpTransport.handleRequest(req, res, req.body);
+
+  const sessionId = httpTransport.sessionId;
+  if (sessionId) {
+    httpTransportMap.set(sessionId, httpTransport);
+  }
+}
+
+/**
+ * Handles existing session requests
+ */
+async function handleExistingSession(
+  sessionId: string,
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const httpTransport = getTransportForSession(sessionId);
+  await httpTransport.handleRequest(req, res, req.body);
+}
+
+const app = express();
+app.use(express.json());
+
+// Middleware to validate authorization and create MCP server
+app.use((req, _res, next) => {
+  try {
+    const authHeader = validateAuthHeader(req.headers[HEADERS.AUTHORIZATION]);
+    req.mcpServer = createMCPServerInstance(authHeader);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Error handling middleware
 app.use((err: HTTPError, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Server error:", err.message);
   const status = err.status || 500;
-  const message = status === 500 ? "Internal server error" : err.message;
+  const message = status === 500 ? ERROR_MESSAGES.INTERNAL_ERROR : err.message;
   res.status(status).json({ error: message });
 });
 
-app.get("/mcp", async (req, res) => {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
-
-  if (!sessionId) {
-    console.error("mcp-session-id header is required");
-    res.status(400).json({ error: "mcp-session-id header is required" });
-    return;
+app.get("/mcp", async (req, res, next) => {
+  try {
+    const sessionId = validateSessionId(req.headers[HEADERS.SESSION_ID]);
+    const httpTransport = getTransportForSession(sessionId);
+    await httpTransport.handleRequest(req, res, req.body);
+    // ?TODO: this.streamMessages(httpTransport)
+  } catch (error) {
+    next(error);
   }
-
-  const transport = httpTransportMap.get(sessionId);
-  if (!transport) {
-    console.error(`No transport found for sessionId: ${sessionId}`);
-    res.status(400).json({ error: "Transport not found" });
-    return;
-  }
-
-  await transport.handleRequest(req, res, req.body);
-  // ?TODO: this.streamMessages(transport)
 });
 
-app.post("/mcp", async (req, res) => {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
+app.post("/mcp", async (req, res, next) => {
+  try {
+    const sessionId = req.headers[HEADERS.SESSION_ID] as string | undefined;
 
-  if (!sessionId && isInitializeReq(req.body)) {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-
-    await req.mcpServer.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-
-    const sessionId = transport.sessionId;
-    if (sessionId) {
-      httpTransportMap.set(sessionId, transport);
+    // Handle initialization requests (no session ID required)
+    if (!sessionId && isInitializeReq(req.body)) {
+      await createAndConnectTransport(req.mcpServer, req, res);
+      return;
     }
-    return;
-  }
 
-  const transport = sessionId ? httpTransportMap.get(sessionId) : undefined;
-  if (transport) {
-    await transport.handleRequest(req, res, req.body);
-    return;
-  }
+    // Handle existing session requests
+    if (sessionId) {
+      await handleExistingSession(sessionId, req, res);
+      return;
+    }
 
-  res.status(400).json({ error: "Invalid session ID or method" });
+    // Invalid request - no session ID and not an initialize request
+    throw new HTTPError(400, ERROR_MESSAGES.INVALID_SESSION);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.get("/", (_req: Request, res: Response) => {
   res.send(
-    "This is the Firehydrant MCP server. Use the /sse endpoint for SSE connections.",
+    "This is the Firehydrant MCP server. Use the /mcp endpoint for MCP connections.",
   );
 });
 
-const PORT = process.env["PORT"] || 3000;
+const PORT = process.env["PORT"] || DEFAULT_PORT;
 
 app
   .listen(PORT, () => {})
