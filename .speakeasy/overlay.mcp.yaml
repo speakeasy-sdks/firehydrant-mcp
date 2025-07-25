@@ -49,15 +49,9 @@ actions:
       update_incident_retrospective_field:
         properties:
           value:
-            oneOf:
-              - type: integer
-              - type: string
-              - type: array
-                items: string
-              - type: array
-                items:
-                  type: object
-                  additionalProperties: true
+            type: string
+            description: >
+              The value of the field in the retrospective. Unstyled HTML is expected.
             format: ~
       Incidents_RetrospectiveFieldEntity:
         properties:
