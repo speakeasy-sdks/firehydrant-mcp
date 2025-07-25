@@ -457,7 +457,7 @@ paths:
             "application/json":
               schema: {"$ref": "#/components/schemas/Incidents_RetrospectiveFieldEntity"}
       x-codegen-request-body-name: "update_incident_retrospective_field"
-      x-speakeasy-mcp: {"disabled": false, "description": "Updates a field in a retrospective (RCA) for an incident. Among other things, this is useful for:\n\n  - Updating a field in a retrospective,\n  - Updating the value of a field in a retrospective.\n\nValues should be compatible with the tiptap editor (array structure).\n"}
+      x-speakeasy-mcp: {"disabled": false, "description": "Updates a field in a retrospective (RCA) for an incident. Among other things, this is useful for:\n\n  - Updating a field in a retrospective,\n  - Updating the value of a field in a retrospective.\n\nThe value should be unstyled HTML.\n"}
   "/v1/incidents/{incident_id}/retrospectives/{retrospective_id}/fields/{field_id}/inputs": {}
   "/v1/incident_roles": {}
   "/v1/incident_roles/{incident_role_id}": {}

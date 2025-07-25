@@ -41,7 +41,7 @@ actions:
             - Updating a field in a retrospective,
             - Updating the value of a field in a retrospective.
 
-          Values should be compatible with the tiptap editor (array structure).
+          The value should be unstyled HTML.
   - target: $["components"]["schemas"]["Incidents_RetrospectiveFieldEntity"]["properties"]["value"]["type"]
     remove: true
   - target: $.components.schemas
