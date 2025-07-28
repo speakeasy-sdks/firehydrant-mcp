@@ -11,7 +11,7 @@ const args = {
 };
 
 export const tool$incidentsCreateIncident: ToolDefinition<typeof args> = {
-  name: "incidents-create-incident",
+  name: "create-incident",
   description: `Create an incident
 
 Create a new incident`,

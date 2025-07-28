@@ -12,6 +12,7 @@ actions:
     update:
       x-speakeasy-mcp:
         disabled: false
+        name: list-retros-by-incident
         description: >
           Lists all retrospectives (RCAs) for an incident. Among other things, this is
           useful for:
@@ -24,16 +25,19 @@ actions:
     update:
       x-speakeasy-mcp:
         disabled: false
+        name: list-incidents
 
   - target: $.paths..[?@.operationId == "create_incident"]
     update:
       x-speakeasy-mcp:
         disabled: false
+        name: create-incident
 
   - target: $.paths..[?@.operationId == "update_incident_retrospective_field"]
     update:
       x-speakeasy-mcp:
         disabled: false
+        name: update-retrospective-field
         description: >
           Updates a field in a retrospective (RCA) for an incident. Among other things,
           this is useful for:
@@ -70,6 +74,7 @@ actions:
     update:
       x-speakeasy-mcp:
         disabled: false
+        name: list-alerts
 
   - target: $.paths.*[?@["x-speakeasy-mcp"].disabled != false]
     remove: true
