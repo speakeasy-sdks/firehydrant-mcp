@@ -29,6 +29,20 @@ FireHydrant MCP Server: An MCP server for interacting with FireHydrant's API.
 ## Installation
 
 <details>
+<summary>DXT (Desktop Extension)</summary>
+
+Install the MCP server as a Desktop Extension using the pre-built [`mcp-server.dxt`](./mcp-server.dxt) file:
+
+Simply drag and drop the [`mcp-server.dxt`](./mcp-server.dxt) file onto Claude Desktop to install the extension.
+
+The DXT package includes the MCP server and all necessary configuration. Once installed, the server will be available without additional setup.
+
+> [!NOTE]
+> DXT (Desktop Extensions) provide a streamlined way to package and distribute MCP servers. Learn more about [Desktop Extensions](https://www.anthropic.com/engineering/desktop-extensions).
+
+</details>
+
+<details>
 <summary>Cursor</summary>
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=FireHydrant&config=eyJtY3BTZXJ2ZXJzIjp7IkZpcmVIeWRyYW50Ijp7ImNvbW1hbmQiOiJucHgiLCJhcmdzIjpbImZpcmVoeWRyYW50LW1jcCIsInN0YXJ0IiwiLS1hcGkta2V5IiwiLi4uIl19fX0=)
