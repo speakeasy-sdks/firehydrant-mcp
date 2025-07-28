@@ -11,7 +11,7 @@ const args = {
 };
 
 export const tool$alertsListAlerts: ToolDefinition<typeof args> = {
-  name: "alerts-list-alerts",
+  name: "list-alerts",
   description: `List alerts
 
 Retrieve all alerts from third parties`,

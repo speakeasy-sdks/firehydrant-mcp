@@ -13,7 +13,7 @@ const args = {
 export const tool$retrospectivesListIncidentRetrospectives: ToolDefinition<
   typeof args
 > = {
-  name: "retrospectives-list-incident-retrospectives",
+  name: "list-retros-by-incident",
   description:
     `Lists all retrospectives (RCAs) for an incident. Among other things, this is useful for:
 

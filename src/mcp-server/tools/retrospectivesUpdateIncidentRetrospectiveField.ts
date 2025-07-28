@@ -12,7 +12,7 @@ const args = {
 
 export const tool$retrospectivesUpdateIncidentRetrospectiveField:
   ToolDefinition<typeof args> = {
-    name: "retrospectives-update-incident-retrospective-field",
+    name: "update-retrospective-field",
     description:
       `Updates a field in a retrospective (RCA) for an incident. Among other things, this is useful for:
 

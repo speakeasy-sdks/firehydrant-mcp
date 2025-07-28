@@ -11,7 +11,7 @@ const args = {
 };
 
 export const tool$incidentsListIncidents: ToolDefinition<typeof args> = {
-  name: "incidents-list-incidents",
+  name: "list-incidents",
   description: `List incidents
 
 List all of the incidents in the organization`,
