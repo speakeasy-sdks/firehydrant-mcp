@@ -29,50 +29,42 @@ FireHydrant MCP Server: An MCP server for interacting with FireHydrant's API.
 ## Installation
 
 <details>
-<summary>Claude</summary>
+<summary>DXT (Desktop Extension)</summary>
 
-Add the following server definition to your `claude_desktop_config.json` file:
+Install the MCP server as a Desktop Extension using the pre-built [`mcp-server.dxt`](./mcp-server.dxt) file:
 
-```json
-{
-  "mcpServers": {
-    "FireHydrant": {
-      "type": "sse",
-      "url": "https://example-cloudflare-worker.com/sse",
-      "headers": {
-        "Authorization": "${FIREHYDRANT-MCP_API_KEY}"
-      }
-    }
-  }
-}
-```
+Simply drag and drop the [`mcp-server.dxt`](./mcp-server.dxt) file onto Claude Desktop to install the extension.
+
+The DXT package includes the MCP server and all necessary configuration. Once installed, the server will be available without additional setup.
 
 > [!NOTE]
-> To use Cloudflare deployment, set the `cloudflareURL` in your gen.yaml configuration to your Worker URL (e.g., https://my-mcp-server.my-account.workers.dev).
+> DXT (Desktop Extensions) provide a streamlined way to package and distribute MCP servers. Learn more about [Desktop Extensions](https://www.anthropic.com/engineering/desktop-extensions).
 
 </details>
 
 <details>
 <summary>Cursor</summary>
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=FireHydrant&config=eyJtY3BTZXJ2ZXJzIjp7IkZpcmVIeWRyYW50Ijp7InR5cGUiOiJzc2UiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUtY2xvdWRmbGFyZS13b3JrZXIuY29tL3NzZSIsImhlYWRlcnMiOnsiQXV0aG9yaXphdGlvbiI6IiR7RklSRUhZRFJBTlQtTUNQX0FQSV9LRVl9In19fX0=)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=FireHydrant&config=eyJtY3BTZXJ2ZXJzIjp7IkZpcmVIeWRyYW50Ijp7ImNvbW1hbmQiOiJucHgiLCJhcmdzIjpbImZpcmVoeWRyYW50LW1jcCIsInN0YXJ0IiwiLS1hcGkta2V5IiwiLi4uIl19fX0=)
 
 Or manually:
 
 1. Open Cursor Settings
 2. Select Tools and Integrations
 3. Select New MCP Server
-4. Paste the following JSON into the MCP Server Configuration field:
+4. If the configuration file is empty paste the following JSON into the MCP Server Configuration:
 
 ```json
 {
   "mcpServers": {
     "FireHydrant": {
-      "type": "sse",
-      "url": "https://example-cloudflare-worker.com/sse",
-      "headers": {
-        "Authorization": "${FIREHYDRANT-MCP_API_KEY}"
-      }
+      "command": "npx",
+      "args": [
+        "firehydrant-mcp",
+        "start",
+        "--api-key",
+        "..."
+      ]
     }
   }
 }
@@ -84,27 +76,32 @@ Or manually:
 <summary>Claude Code CLI</summary>
 
 ```bash
-claude mcp add --transport sse FireHydrant undefined/sse --header "Authorization: ..."
+npx firehydrant-mcp start --api-key ...
 ```
 
 </details>
-
 <details>
-<summary>Manual installation</summary>
+<summary>Claude Desktop</summary>
+Claude Desktop doesn't yet support SSE/remote MCP servers.
 
+However, you can run the MCP server locally by cloning this repository. Once cloned, you'll need to install dependencies (`npm install`) and build the server (`npm run build`).
 
+Then, configure your server definition to reference your local clone. For example:
 
-
-To start the MCP server, run:
-
-```bash
-npx -y --package firehydrant-mcp -- mcp start --api-key ...
-```
-
-For a full list of server arguments, run:
-
-```bash
-npx -y --package firehydrant-mcp -- mcp start --help
+```json
+{
+  "mcpServers": {
+    "FireHydrant": {
+      "command": "node",
+      "args": [
+        "./bin/mcp-server.js",
+        "start",
+        "--api-key",
+        "..."
+      ]
+    }
+  }
+}
 ```
 
 </details>

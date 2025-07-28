@@ -35,7 +35,7 @@ export type SDKOptions = {
    */
   retryConfig?: RetryConfig;
   timeoutMs?: number;
-  debugLogger?: Logger;
+  debugLogger?: Logger | undefined;
 };
 
 export function serverURLFromOptions(options: SDKOptions): URL | null {
@@ -58,8 +58,8 @@ export function serverURLFromOptions(options: SDKOptions): URL | null {
 export const SDK_METADATA = {
   language: "typescript",
   openapiDocVersion: "0.0.1",
-  sdkVersion: "0.0.1-beta.10",
-  genVersion: "2.661.4",
+  sdkVersion: "0.0.1-beta.9",
+  genVersion: "2.667.0",
   userAgent:
-    "speakeasy-sdk/mcp-typescript 0.0.1-beta.10 2.661.4 0.0.1 firehydrant-mcp",
+    "speakeasy-sdk/mcp-typescript 0.0.1-beta.9 2.667.0 0.0.1 firehydrant-mcp",
 } as const;

@@ -1,19 +1,19 @@
 lockVersion: 2.0.0
 id: 0dd544ca-3933-4c41-a5b5-b9a57ec94099
 management:
-  docChecksum: 806c7aab4f987da73bd407c8b3c7cc5a
+  docChecksum: f0c9b1fde7f1749425dc69efbe0c3b69
   docVersion: 0.0.1
-  speakeasyVersion: 1.586.0
-  generationVersion: 2.661.4
-  releaseVersion: 0.0.1-beta.10
-  configChecksum: dd705d417f04d3fc26b5d1c21d9a552d
+  speakeasyVersion: 1.592.0
+  generationVersion: 2.667.0
+  releaseVersion: 0.0.1-beta.9
+  configChecksum: edb419d3013460da6c6f0a792a84517b
   repoURL: https://github.com/firehydrant/firehydrant-mcp.git
   published: true
 features:
   mcp-typescript:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.0
-    core: 0.2.1
+    core: 0.3.0
     defaultEnabledRetries: 0.1.0
     enumUnions: 0.1.0
     globalSecurity: 0.1.0
@@ -25,11 +25,12 @@ features:
     sdkHooks: 0.1.0
     unions: 0.1.0
 generatedFiles:
+  - .dxtignore
   - .gitattributes
   - .npmignore
   - eslint.config.mjs
+  - manifest.json
   - package.json
-  - src/cloudflare-worker.ts
   - src/core.ts
   - src/funcs/alertsListAlerts.ts
   - src/funcs/incidentsCreateIncident.ts
@@ -136,8 +137,5 @@ generatedFiles:
   - src/types/rfcdate.ts
   - src/types/streams.ts
   - tsconfig.json
-  - worker-configuration.d.ts
-  - worker-configuration.ts
-  - wrangler.toml
 examplesVersion: 1.0.2
 generatedTests: {}

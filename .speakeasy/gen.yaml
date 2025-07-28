@@ -22,14 +22,17 @@ generation:
     generateNewTests: false
     skipResponseBodyAssertions: false
 mcp-typescript:
-  version: 0.0.1-beta.10
+  version: 0.0.1-beta.9
   additionalDependencies:
-    dependencies: {}
+    dependencies:
+      '@tiptap/core': ^3.0.7
+      '@tiptap/html': ^3.0.7
+      '@tiptap/starter-kit': ^3.0.7
     devDependencies: {}
     peerDependencies: {}
   author: FireHydrant
   baseErrorName: FireHydrantError
-  cloudflareEnabled: true
+  cloudflareEnabled: false
   defaultErrorName: FireHydrantDefaultError
   inputModelSuffix: input
   outputModelSuffix: output
