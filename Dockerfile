@@ -5,7 +5,7 @@
 ##
 
 # Use a multi-stage build to keep the final image small
-FROM node:24-bookworm-slim AS builder
+FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
 
