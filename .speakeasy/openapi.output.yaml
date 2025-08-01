@@ -645,7 +645,7 @@ paths:
               - "exclude"
         - name: "statuses"
           in: "query"
-          description: "A comma separated list of statuses to filter by. Valid statuses are: opened, acknowledged, resolved, ignored, expired, or linked"
+          description: "A comma separated list of statuses to filter by. Valid statuses are: opened, acknowledged, resolved, ignored, expired, linked, or snoozed"
           schema:
             type: "string"
             nullable: true
