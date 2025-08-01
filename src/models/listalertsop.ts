@@ -59,7 +59,7 @@ export const ListAlertsRequest$zodSchema: z.ZodType<
     "A comma separated list of signals rule IDs. This currently only works for Signals alerts.",
   ).nullable().optional(),
   statuses: z.string().describe(
-    "A comma separated list of statuses to filter by. Valid statuses are: opened, acknowledged, resolved, ignored, expired, or linked",
+    "A comma separated list of statuses to filter by. Valid statuses are: opened, acknowledged, resolved, ignored, expired, linked, or snoozed",
   ).nullable().optional(),
   tag_match_strategy: ListAlertsTagMatchStrategy$zodSchema.nullable()
     .optional(),
