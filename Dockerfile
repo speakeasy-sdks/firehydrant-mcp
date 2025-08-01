@@ -37,4 +37,7 @@ COPY --from=builder /app/express-server ./express-server
 
 EXPOSE 3000
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+  CMD curl -f http://localhost:3000/health || exit 1
+
 CMD ["./express-server"]
