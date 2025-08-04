@@ -81,7 +81,7 @@ actions:
       x-speakeasy-mcp:
         disabled: false
         name: list-alerts
-        scopes: "read", "write"
+        scopes: "read"
 
   - target: $.paths.*[?@["x-speakeasy-mcp"].disabled != false]
     remove: true
