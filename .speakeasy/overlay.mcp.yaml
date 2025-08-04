@@ -43,7 +43,9 @@ actions:
       x-speakeasy-mcp:
         disabled: false
         name: update-retrospective-field
-        scopes: "read", "write"
+        scopes:
+          - "read"
+          - "write"
         description: >
           Updates a field in a retrospective (RCA) for an incident. Among other things,
           this is useful for:
