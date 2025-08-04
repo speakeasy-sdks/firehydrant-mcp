@@ -34,14 +34,14 @@ actions:
       x-speakeasy-mcp:
         disabled: false
         name: create-incident
-        scopes: "write"
+        scopes: "read", "write"
 
   - target: $.paths..[?@.operationId == "update_incident_retrospective_field"]
     update:
       x-speakeasy-mcp:
         disabled: false
         name: update-retrospective-field
-        scopes: "write"
+        scopes: "read", "write"
         description: >
           Updates a field in a retrospective (RCA) for an incident. Among other things,
           this is useful for:
