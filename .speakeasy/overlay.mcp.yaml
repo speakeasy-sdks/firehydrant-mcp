@@ -34,7 +34,9 @@ actions:
       x-speakeasy-mcp:
         disabled: false
         name: create-incident
-        scopes: "read", "write"
+        scopes:
+          - "read"
+          - "write"
 
   - target: $.paths..[?@.operationId == "update_incident_retrospective_field"]
     update:
